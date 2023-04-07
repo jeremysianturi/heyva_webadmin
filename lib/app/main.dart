@@ -1,22 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:heyva_web_admin/app/routes/app_pages.dart';
 import '../constant/keys.dart';
 import '../constant/variabels.dart';
-import 'controllers/auth_controller.dart';
 import '../firebase_options.dart';
+import 'controllers/auth_controller.dart';
 import 'modules/splashscreen/splashscreen.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    name: "heyva-webadmin",
-    options: DefaultFirebaseOptions.currentPlatform,);
-  await Firebase.initializeApp();
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  // await Firebase.initializeApp();
   await GetStorage.init();
   runApp(MyApp());
 }
@@ -41,23 +41,14 @@ class MyApp extends StatelessWidget {
                 stream: authC.streamAuthStatus,
                 builder: (context, snapshot) {
                   authC.setLoginStatus(snapshot.data != null);
-                  // print('snapshot data: ${snapshot.data}');
                   var box = GetStorage();
                   authToken = box.read(Keys.loginAccessToken).toString();
                   refreshToken = box.read(Keys.loginRefreshToken).toString();
                   debugPrint("auth token $authToken");
-                  if (authToken != "null" && refreshToken != "null") {
-                    return GetMaterialApp(
-                      debugShowCheckedModeBanner: false,
-                      title: "HEYVA",
-                      initialRoute: Routes.LOGIN,
-                      getPages: AppPages.routes,
-                    );
-                  }
                   return GetMaterialApp(
                     debugShowCheckedModeBanner: false,
                     title: "HEYVA",
-                    initialRoute: Routes.SIGNUP,
+                    initialRoute: Routes.LOGIN,
                     getPages: AppPages.routes,
                   );
                 });
