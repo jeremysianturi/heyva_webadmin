@@ -43,7 +43,7 @@ class Logging extends Interceptor {
     if(err.response.toString() == "null"){
       bottomSheetMessage(
           color: "red",
-         desc: Strings.internetError
+          desc: Strings.internetError
       );
     }
     return super.onError(err, handler);

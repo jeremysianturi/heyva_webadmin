@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import '../constant/variabels.dart';
+import 'package:heyva_web_admin/constant/variabels.dart';
 import 'logging.dart';
 
 class DioClient {
@@ -12,7 +12,7 @@ class DioClient {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': authToken != "null" || authToken != "" ? basicAuthToken : authToken,
+        'Authorization': authToken.isNotEmpty ? authToken : basicAuthToken,
       },
       connectTimeout: 20.seconds,
       receiveTimeout: 10.seconds,

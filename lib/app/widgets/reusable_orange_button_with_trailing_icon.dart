@@ -4,15 +4,13 @@ import '../../constant/colors.dart';
 class OrangeButtonWTrailingIcon extends StatelessWidget {
   OrangeButtonWTrailingIcon({
     Key? key,
-    required this.determineAction,
     required this.text,
-    this.ontap,
+    this.onTap,
     this.padding = 20,
   }) : super(key: key);
 
-  final String determineAction;
   final String text;
-  final Function? ontap;
+  final Function? onTap;
   double padding;
 
   @override
@@ -23,9 +21,7 @@ class OrangeButtonWTrailingIcon extends StatelessWidget {
         children: [
           ElevatedButton(
             onPressed: () {
-              // if (determineAction == "from_login") {
-              //   Get.to(const OnBoardingOneView());
-              // }
+              onTap!();
             },
             style: ButtonStyle(
               backgroundColor:

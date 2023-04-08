@@ -183,7 +183,9 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                 ),
               ),
             ),
-            OrangeButtonWTrailingIcon(determineAction: "reset_password", text: Strings.change_password,),
+            OrangeButtonWTrailingIcon(text: Strings.change_password,onTap: (){
+
+            },),
           ],
         ),
       ),

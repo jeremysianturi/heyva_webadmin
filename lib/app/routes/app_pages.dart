@@ -12,7 +12,7 @@ class AppPages {
   AppPages._();
 
   // static const INITIAL = Routes.rHOME;
-  static const INITIAL = Routes.PRIVACY_POLICY;
+  static const INITIAL = Routes.LOGIN;
 
   static final routes = [
     GetPage(
