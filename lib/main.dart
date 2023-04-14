@@ -48,7 +48,7 @@ class MyApp extends StatelessWidget {
                   return GetMaterialApp(
                     debugShowCheckedModeBanner: false,
                     title: "HEYVA",
-                    // initialRoute: Routes.LOGIN,
+                    // initialRoute: Routes.LOGIN,try
                     theme: ThemeData(
                       primarySwatch: Colors.deepOrange,
                     ),
