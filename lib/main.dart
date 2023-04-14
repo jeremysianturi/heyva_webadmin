@@ -1,15 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:heyva_web_admin/app/routes/app_pages.dart';
-import '../constant/keys.dart';
-import '../constant/variabels.dart';
-import '../firebase_options.dart';
-import 'controllers/auth_controller.dart';
-import 'modules/splashscreen/splashscreen.dart';
+import 'constant/keys.dart';
+import 'constant/variabels.dart';
+import 'firebase_options.dart';
+import 'app/controllers/auth_controller.dart';
+import 'app/modules/splashscreen/splashscreen.dart';
 
 void main(List<String> args) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +48,11 @@ class MyApp extends StatelessWidget {
                   return GetMaterialApp(
                     debugShowCheckedModeBanner: false,
                     title: "HEYVA",
-                    initialRoute: Routes.LOGIN,
+                    // initialRoute: Routes.LOGIN,
+                    theme: ThemeData(
+                      primarySwatch: Colors.deepOrange,
+                    ),
+                    initialRoute: AppPages.INITIAL,
                     getPages: AppPages.routes,
                   );
                 });

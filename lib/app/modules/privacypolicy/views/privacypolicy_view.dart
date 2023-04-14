@@ -25,7 +25,7 @@ class PrivacyPolicyView extends GetView<PrivacyPolicyController> {
               onTap: (){
                 Get.toNamed(Routes.RESET_PASSWORD);
               },
-                child: Text("data"),),
+                child: const Text("data"),),
           ],
         ),
       ),

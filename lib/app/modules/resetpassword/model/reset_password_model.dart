@@ -44,10 +44,10 @@ class Data {
   }
 
   Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['id'] = id;
-    _data['access_token'] = accessToken;
-    _data['refresh_token'] = refreshToken;
-    return _data;
+    final data = <String, dynamic>{};
+    data['id'] = id;
+    data['access_token'] = accessToken;
+    data['refresh_token'] = refreshToken;
+    return data;
   }
 }

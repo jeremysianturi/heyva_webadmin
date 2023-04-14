@@ -168,7 +168,7 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                     ),
                     if (resetPasswordController.errorMessage.value.isNotEmpty)
                       Container(
-                        margin: EdgeInsets.only(top: 8),
+                        margin: const EdgeInsets.only(top: 8),
                         width: Get.width,
                         child: Text(
                           resetPasswordController.errorMessage.value,

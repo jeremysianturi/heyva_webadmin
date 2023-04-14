@@ -40,9 +40,9 @@ class LoginView extends GetView<LoginController> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
+                        const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             Text(
                               Strings.login,
                               textAlign: TextAlign.center,
@@ -165,7 +165,7 @@ class LoginView extends GetView<LoginController> {
                                 ),
                                 if (controller.errorMessage.value.isNotEmpty)
                                   Container(
-                                    margin: EdgeInsets.only(top: 8),
+                                    margin: const EdgeInsets.only(top: 8),
                                     width: Get.width,
                                     child: Text(
                                       controller.errorMessage.value,
@@ -193,13 +193,13 @@ class LoginView extends GetView<LoginController> {
                       ],
                     ),
                   ),
-                  Expanded(
+                  const Expanded(
                     flex: 1,
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 55),
+                      padding: EdgeInsets.only(bottom: 55),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Text(
                             Strings.cant_login,
                             textAlign: TextAlign.center,

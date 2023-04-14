@@ -5,9 +5,9 @@ import 'logging.dart';
 
 class DioClient {
   Dio init() {
-    Dio _dio = Dio();
-    _dio.interceptors.add(Logging());
-    _dio.options = BaseOptions(
+    Dio dio = Dio();
+    dio.interceptors.add(Logging());
+    dio.options = BaseOptions(
       baseUrl: "http://54.251.132.179:8000",
       headers: {
         'Content-Type': 'application/json',
@@ -17,7 +17,7 @@ class DioClient {
       connectTimeout: 20.seconds,
       receiveTimeout: 10.seconds,
     );
-    _dio.options.baseUrl = "http://54.251.132.179:8000";
-    return _dio;
+    dio.options.baseUrl = "http://54.251.132.179:8000";
+    return dio;
   }
 }
