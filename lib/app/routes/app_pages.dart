@@ -5,7 +5,8 @@ import '../modules/privacypolicy/bindings/privacypolicy_binding.dart';
 import '../modules/privacypolicy/views/privacypolicy_view.dart';
 import '../modules/resetpassword/bindings/resetpassword_binding.dart';
 import '../modules/resetpassword/views/resetpassword_view.dart';
-
+import '../modules/termsofservice/bindings/termsofservice_binding.dart';
+import '../modules/termsofservice/views/termsofservice_view.dart';
 part 'app_routes.dart';
 
 class AppPages {
@@ -24,6 +25,11 @@ class AppPages {
       name: _Paths.PRIVACY_POLICY,
       page: () => PrivacyPolicyView(),
       binding: PrivacyPolicyBinding(),
+    ),
+    GetPage(
+      name: _Paths.TERMS_OF_SERVICE,
+      page: () => TermsOfServiceView(),
+      binding: TermsOfServiceBinding(),
     ),
     GetPage(
       name: _Paths.RESET_PASSWORD,

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import '../../../../constant/strings.dart';
-import '../controllers/privacypolicy_controller.dart';
+import '../controllers/termsofservice_controller.dart';
 
-class PrivacyPolicyView extends GetView<PrivacyPolicyController> {
-  PrivacyPolicyView({super.key});
-
+class TermsOfServiceView extends GetView<TermsOfServiceController> {
+  TermsOfServiceView({super.key});
+  final termsController = Get.put(TermsOfServiceController());
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +21,7 @@ class PrivacyPolicyView extends GetView<PrivacyPolicyController> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text("privacy isinya")
+            Text(termsController.termsOfServiceText)
           ],
         ),
       ),

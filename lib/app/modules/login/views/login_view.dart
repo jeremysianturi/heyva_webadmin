@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:heyva_web_admin/app/modules/termsofservice/views/termsofservice_view.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import '../../../../constant/colors.dart';
 import '../../../../constant/strings.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../widgets/reusable_orange_button_with_trailing_icon.dart';
+import '../../privacypolicy/views/privacypolicy_view.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -33,8 +35,17 @@ class LoginView extends GetView<LoginController> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(flex: 1, child: Container(),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      child: TextButton(
+                        onPressed: () {
+                          Get.to(TermsOfServiceView());
+                        },
+                        child: const Text("Go to Terms of Service"),
                       ),
+                    ),
+                  ),
                   Expanded(
                     flex: 4,
                     child: Column(
@@ -183,8 +194,7 @@ class LoginView extends GetView<LoginController> {
                         OrangeButtonWTrailingIcon(
                           text: Strings.login,
                           onTap: () {
-                            FocusScope.of(context)
-                                .requestFocus(FocusNode());
+                            FocusScope.of(context).requestFocus(FocusNode());
                             if (loginController.validateData) {
                               loginController.postLogin();
                             }
