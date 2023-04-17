@@ -38,11 +38,22 @@ class LoginView extends GetView<LoginController> {
                   Expanded(
                     flex: 1,
                     child: Container(
-                      child: TextButton(
-                        onPressed: () {
-                          Get.to(TermsOfServiceView());
-                        },
-                        child: const Text("Go to Terms of Service"),
+                      child: Column(
+                        children: [
+                          TextButton(
+                            onPressed: () {
+                              Get.to(TermsOfServiceView());
+                            },
+                            child: const Text("Go to Terms of Service"),
+                          ),
+
+                          TextButton(
+                            onPressed: () {
+                              Get.to(PrivacyPolicyView());
+                            },
+                            child: const Text("Go to Privacy Policy"),
+                          ),
+                        ],
                       ),
                     ),
                   ),

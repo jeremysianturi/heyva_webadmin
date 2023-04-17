@@ -17,7 +17,7 @@ class DioClient {
       baseUrl: "http://api-service.heyva.health/",
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        // 'Accept': 'application/json',
         // 'Authorization': token != "null" ? "Bearer $token" : basicAuthToken,
         'Authorization': basicAuthToken,
       },

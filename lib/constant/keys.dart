@@ -7,6 +7,6 @@ class Keys {
   static const String loginID = "REGIST_USER_ID";
 
   /// Terms of service
-  static const String termsOfService = "TERMS_OF_SERVICE";
   static const String termsOfServiceText = "TERMS_OF_SERVICE_TEXT";
+  static const String privacyPolicyText = "PRIVACY_POLICY_TEXT";
 }
