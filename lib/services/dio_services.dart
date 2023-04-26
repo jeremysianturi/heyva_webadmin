@@ -14,7 +14,7 @@ class DioClient {
     Dio _dio = Dio();
     _dio.interceptors.add(Logging());
     _dio.options = BaseOptions(
-      baseUrl: "http://api-service.heyva.health/",
+      baseUrl: "http://54.169.131.201/",
       headers: {
         'Content-Type': 'application/json',
         // 'Accept': 'application/json',
@@ -24,7 +24,7 @@ class DioClient {
       connectTimeout: 20.seconds,
       receiveTimeout: 10.seconds,
     );
-    _dio.options.baseUrl = "http://api-service.heyva.health/";
+    _dio.options.baseUrl = "http://54.169.131.201/";
     return _dio;
   }
 }
