@@ -64,7 +64,12 @@ class MyApp extends StatelessWidget {
                     debugShowCheckedModeBanner: false,
                     title: "HEYVA",
                     initialRoute: Routes.LOGIN,
-                    getPages: AppPages.routes,
+                    // getPages: AppPages.routes,
+                    getPages: [
+                      GetPage(name: Routes.PRIVACY_POLICY, page: () => PrivacyPolicyView()),
+                      GetPage(name: Routes.LOGIN, page: () => LoginView()),
+                      GetPage(name: Routes.TERMS_OF_SERVICE, page: () => TermsOfServiceView())
+                    ],
                   );
                 });
           }
