@@ -7,6 +7,7 @@ abstract class Routes {
   static const LOGIN = _Paths.LOGIN;
   static const REGISTER = _Paths.REGISTER;
   static const PRIVACY_POLICY = _Paths.PRIVACY_POLICY;
+  static const TERMS_OF_SERVICE = _Paths.TERMS_OF_SERVICE;
   static const RESET_PASSWORD = _Paths.RESET_PASSWORD;
   static const HOME = _Paths.HOME;
   static const OTHERS = _Paths.OTHERS;
@@ -19,7 +20,8 @@ abstract class _Paths {
   static const LOGIN = '/login';
   static const REGISTER = '/register';
   static const PRIVACY_POLICY = '/privacypolicy';
+  static const TERMS_OF_SERVICE = '/termsofservice';
   static const RESET_PASSWORD = '/resetpassword';
-  static const HOME = '/home';
+  static const HOME = '/admin';
   static const OTHERS = '/others';
 }

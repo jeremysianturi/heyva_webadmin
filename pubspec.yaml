@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
+  google_fonts: ^4.0.3
   get: 4.6.5
   dio: ^5.0.3
   loading_overlay: ^0.3.0
@@ -19,6 +20,13 @@ dependencies:
   firebase_auth: ^4.4.0
   json_annotation: ^4.6.0
   easy_sidemenu: ^0.4.1+1
+  http: ^0.13.5
+  provider: any
+  intl: ^0.17.0
+  datetime_picker_formfield: ^2.0.1
+  flutter_riverpod: ^2.3.5
+  file_picker:
+#  date_field: ^3.0.5
 
 dev_dependencies:
   flutter_lints: 2.0.1

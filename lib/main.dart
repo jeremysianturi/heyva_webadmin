@@ -4,8 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:heyva_web_admin/app/modules/home/controllers/admin_routes.dart';
+import 'package:heyva_web_admin/app/modules/home/controllers/init_dependency.dart';
+import 'package:heyva_web_admin/app/modules/home/views/admin_page.dart';
 import 'package:heyva_web_admin/app/routes/app_pages.dart';
-import 'constant/keys.dart';
+import 'app/modules/home/controllers/menu_controller.dart';
+import 'app/modules/home/controllers/navigation_controllers.dart';
+import 'app/modules/home/views/admin_layout.dart';
 import 'constant/variabels.dart';
 import 'firebase_options.dart';
 import 'app/controllers/auth_controller.dart';
@@ -16,7 +21,7 @@ void main(List<String> args) async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // await Firebase.initializeApp();
+  await Firebase.initializeApp();
   await GetStorage.init();
   runApp(MyApp());
 }
@@ -24,6 +29,8 @@ void main(List<String> args) async {
 class MyApp extends StatelessWidget {
   var scrollController = ScrollController();
   final authC = Get.put(AuthController(), permanent: true);
+  final menuController = Get.put(AdminMenuController(), permanent: true);
+  final navigationController = Get.put(NavigationController(), permanent: true);
 
   MyApp({Key? key}) : super(key: key);
 
@@ -40,20 +47,39 @@ class MyApp extends StatelessWidget {
             return StreamBuilder<User?>(
                 stream: authC.streamAuthStatus,
                 builder: (context, snapshot) {
-                  authC.setLoginStatus(snapshot.data != null);
-                  var box = GetStorage();
-                  authToken = box.read(Keys.loginAccessToken).toString();
-                  refreshToken = box.read(Keys.loginRefreshToken).toString();
+                  // authC.setLoginStatus(snapshot.data != null);
+                  // var box = GetStorage();
+                  // authToken = box.read(Keys.loginAccessToken).toString();
+                  // refreshToken = box.read(Keys.loginRefreshToken).toString();
                   debugPrint("auth token $authToken");
+                  // var loginC = Get.put(LoginController());
+                  // loginC.refresh();
+
+                  // if (authToken != "null" && refreshToken != "null") {
+                  //   return GetMaterialApp(
+                  //     debugShowCheckedModeBanner: false,
+                  //     title: "HEYVA",
+                  //     initialRoute: Routes.INITIAL_PAGE,
+                  //     getPages: AppPages.routes,
+                  //   );
+                  // }
                   return GetMaterialApp(
                     debugShowCheckedModeBanner: false,
                     title: "HEYVA",
                     // initialRoute: Routes.LOGIN,try
-                    theme: ThemeData(
-                      primarySwatch: Colors.deepOrange,
+                    theme: Theme.of(context).copyWith(
+                      colorScheme: Theme.of(context).colorScheme.copyWith(
+                        primary: const Color(0xFFEC9BAD),
+                      ),
                     ),
-                    initialRoute: AppPages.INITIAL,
-                    getPages: AppPages.routes,
+                    // initialBinding: InitDependency(),
+                    builder: (context, child) => AdminLayout(child: child!),
+                    navigatorKey: navigationController.navigatorKey,
+                    onGenerateRoute: toGenerateRoute,
+                    initialRoute: adminPageRoute,
+                    // initialRoute: dashboardPageRoute,
+                    // initialRoute: AppPages.INITIAL,
+                    // getPages: AppPages.routes,
                   );
                 });
           }
