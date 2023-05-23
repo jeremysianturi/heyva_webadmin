@@ -1,25 +1,28 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:heyva_web_admin/app/modules/forgotpassword/views/forgotpass_view.dart';
-import 'package:heyva_web_admin/app/modules/termsofservice/views/termsofservice_view.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_state_manager/src/simple/get_view.dart';
+import 'package:heyva_web_admin/app/modules/forgotpassword/controllers/forgotpass_controller.dart';
 import 'package:loading_overlay/loading_overlay.dart';
+
 import '../../../../constant/colors.dart';
 import '../../../../constant/strings.dart';
 import '../../../controllers/auth_controller.dart';
+import '../../../routes/app_pages.dart';
 import '../../../widgets/reusable_orange_button_with_trailing_icon.dart';
-import '../../privacypolicy/views/privacypolicy_view.dart';
-import '../controllers/login_controller.dart';
+import '../../termsofservice/views/termsofservice_view.dart';
 
-class LoginView extends GetView<LoginController> {
-  LoginView({Key? key}) : super(key: key);
-  final loginController = Get.put(LoginController());
+class ForgotPasswordView extends GetView<ForgotPasswordController> {
+  ForgotPasswordView({Key? key}) : super(key: key);
+  final forgotPassController = Get.put(ForgotPasswordController());
   final authC = Get.find<AuthController>();
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => LoadingOverlay(
+          () => LoadingOverlay(
           isLoading: controller.isLoading.value,
           color: ColorApp.btn_orange,
           opacity: 0.3,
@@ -39,27 +42,11 @@ class LoginView extends GetView<LoginController> {
                   Expanded(
                     flex: 1,
                     child: Container(
-                      child: Column(
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Get.to(TermsOfServiceView());
-                            },
-                            child: const Text("Go to Terms of Service"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Get.to(PrivacyPolicyView());
-                            },
-                            child: const Text("Go to Privacy Policy"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Get.to(ForgotPasswordView());
-                            },
-                            child: const Text("Go to Forgot Password"),
-                          ),
-                        ],
+                      child: TextButton(
+                        onPressed: () {
+                          Get.to(TermsOfServiceView());
+                        },
+                        child: const Text("Go to Terms of Service"),
                       ),
                     ),
                   ),
@@ -70,7 +57,7 @@ class LoginView extends GetView<LoginController> {
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
+                          children: [
                             Text(
                               Strings.login,
                               textAlign: TextAlign.center,
@@ -88,7 +75,7 @@ class LoginView extends GetView<LoginController> {
                             child: Column(
                               children: [
                                 TextFormField(
-                                  controller: loginController.emailC,
+                                  controller: forgotPassController.emailC,
                                   decoration: InputDecoration(
                                     hintText: Strings.email_adress,
                                     contentPadding: const EdgeInsets.symmetric(
@@ -123,15 +110,15 @@ class LoginView extends GetView<LoginController> {
                                   height: 12,
                                 ),
                                 Obx(
-                                  () => TextField(
-                                    controller: loginController.passC,
+                                      () => TextField(
+                                    controller: forgotPassController.passC,
                                     obscureText:
-                                        loginController.isObscure.value,
+                                    forgotPassController.isObscure.value,
                                     decoration: InputDecoration(
                                         hintText: Strings.password,
                                         contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 17, horizontal: 20),
+                                        const EdgeInsets.symmetric(
+                                            vertical: 17, horizontal: 20),
                                         filled: true,
                                         fillColor: ColorApp.text_input_bg,
                                         hintStyle: const TextStyle(
@@ -141,15 +128,15 @@ class LoginView extends GetView<LoginController> {
                                         labelStyle: const TextStyle(
                                             fontSize: 16,
                                             color:
-                                                ColorApp.black_font_underline,
+                                            ColorApp.black_font_underline,
                                             fontWeight: FontWeight.w400),
                                         border: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(14),
+                                          BorderRadius.circular(14),
                                         ),
                                         errorBorder: OutlineInputBorder(
                                           borderRadius:
-                                              BorderRadius.circular(14),
+                                          BorderRadius.circular(14),
                                           borderSide: const BorderSide(
                                             color: ColorApp.red_error,
                                             width: 2.0,
@@ -159,29 +146,29 @@ class LoginView extends GetView<LoginController> {
                                             ? "error"
                                             : null,
                                         errorStyle:
-                                            const TextStyle(fontSize: 0.01),
+                                        const TextStyle(fontSize: 0.01),
                                         suffixIcon: InkWell(
                                           onTap: () {
-                                            loginController.isObscure.value =
-                                                !loginController
-                                                    .isObscure.value;
+                                            forgotPassController.isObscure.value =
+                                            !forgotPassController
+                                                .isObscure.value;
                                           },
                                           child: Column(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                             children: [
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     right: 20.0),
                                                 child: Text(
-                                                  loginController
-                                                          .isObscure.isTrue
+                                                  forgotPassController
+                                                      .isObscure.isTrue
                                                       ? "Show"
                                                       : "Hide",
                                                   style: const TextStyle(
                                                       fontSize: 14,
                                                       fontWeight:
-                                                          FontWeight.w600,
+                                                      FontWeight.w600,
                                                       color: ColorApp
                                                           .black_font_underline),
                                                 ),
@@ -193,7 +180,7 @@ class LoginView extends GetView<LoginController> {
                                 ),
                                 if (controller.errorMessage.value.isNotEmpty)
                                   Container(
-                                    margin: EdgeInsets.only(top: 8),
+                                    margin: const EdgeInsets.only(top: 8),
                                     width: Get.width,
                                     child: Text(
                                       controller.errorMessage.value,
@@ -211,9 +198,10 @@ class LoginView extends GetView<LoginController> {
                         OrangeButtonWTrailingIcon(
                           text: Strings.login,
                           onTap: () {
+                            Get.offAllNamed(Routes.LOGIN);
                             FocusScope.of(context).requestFocus(FocusNode());
-                            if (loginController.validateData) {
-                              loginController.postLogin();
+                            if (forgotPassController.validateData) {
+                              forgotPassController.postLogin();
                             }
                           },
                         )
@@ -223,10 +211,10 @@ class LoginView extends GetView<LoginController> {
                   Expanded(
                     flex: 1,
                     child: Padding(
-                      padding: const EdgeInsets.only(bottom: 55),
+                      padding: EdgeInsets.only(bottom: 55),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Text(
                             Strings.cant_login,
                             textAlign: TextAlign.center,
