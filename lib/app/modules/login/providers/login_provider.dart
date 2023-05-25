@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:heyva_web_admin/app/modules/login/model/login_model.dart';
 
+import '../../../../services/dio_services.dart';
+
 class LoginProvider {
   final Dio _client;
 
@@ -11,7 +13,8 @@ class LoginProvider {
     LoginModel? res;
     try {
       Response response = await _client.post(
-        '/api/v1/users/login',
+        // 'http://54.169.131.201:8000/api/v1/users/login',
+        '$heyApiBaseUrl/api/v1/users/login',
         data: {"username": username, "password": password},
       );
       res = LoginModel.fromJson(response.data);
@@ -28,7 +31,8 @@ class LoginProvider {
     LoginModel? res;
     try {
       Response response = await _client.post(
-        '/api/v1/users/refresh-token',
+        // '/api/v1/users/refresh-token',
+        '$heyApiBaseUrl/api/v1/users/login',
         data: {"id": userId, "refresh_token": refreshToken},
       );
       debugPrint('response data: ${response.data}');

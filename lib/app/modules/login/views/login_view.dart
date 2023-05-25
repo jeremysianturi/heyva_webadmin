@@ -7,6 +7,7 @@ import '../../../../constant/strings.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/reusable_orange_button_with_trailing_icon.dart';
+import '../../home/views/admin_layout.dart';
 import '../../privacypolicy/views/privacypolicy_view.dart';
 import '../controllers/login_controller.dart';
 
@@ -139,7 +140,7 @@ class LoginView extends GetView<LoginController> {
                                             width: 2.0,
                                           ),
                                         ),
-                                        errorText: controller.isPasserror.isTrue
+                                        errorText: controller.isPassError.isTrue
                                             ? "error"
                                             : null,
                                         errorStyle:
@@ -195,7 +196,6 @@ class LoginView extends GetView<LoginController> {
                         OrangeButtonWTrailingIcon(
                           text: Strings.login,
                           onTap: () {
-                            Get.offAllNamed(Routes.HOME);
                             FocusScope.of(context).requestFocus(FocusNode());
                             if (loginController.validateData) {
                               loginController.postLogin();

@@ -5,8 +5,9 @@ import '../controllers/navigation_controllers.dart';
 
 
 class AdminLayout extends StatelessWidget {
-  final Widget child;
-  const AdminLayout({super.key, required this.child});
+  // final Widget child;
+  // const AdminLayout({super.key, required this.child});
+  const AdminLayout({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +20,8 @@ class AdminLayout extends StatelessWidget {
             ),
             Expanded(
               flex: 5,
-              // child: localNavigator(),
-              child: child,
+              child: localNavigator(),
+              // child: child,
             ),
           ],
         ),

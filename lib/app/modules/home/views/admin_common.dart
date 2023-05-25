@@ -107,12 +107,12 @@ class DrawerListTile extends StatelessWidget {
       leading: isSvg ?
       SvgPicture.asset(
         svgSrc,
-        color: selectedMenu == title ? ColorApp.btn_pink : Colors.black,
+        color: selectedMenu == title ? ColorApp.btn_orange : Colors.black,
         height: 16,
       )
           : Image.asset(
         svgSrc,
-        color: selectedMenu == title ? ColorApp.btn_pink : Colors.black,
+        color: selectedMenu == title ? ColorApp.btn_orange : Colors.black,
         height: 16,
       ),
       horizontalTitleGap: 0.2,
@@ -121,7 +121,7 @@ class DrawerListTile extends StatelessWidget {
         style: selectedMenu == title ?
           const TextStyle(
             fontWeight: FontWeight.bold,
-            color: ColorApp.btn_pink,
+            color: ColorApp.btn_orange,
           )
           : const TextStyle(
             color: Colors.black87,

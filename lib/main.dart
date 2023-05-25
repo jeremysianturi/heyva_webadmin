@@ -6,12 +6,13 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:heyva_web_admin/app/modules/home/controllers/admin_routes.dart';
 import 'package:heyva_web_admin/app/modules/home/controllers/init_dependency.dart';
+import 'package:heyva_web_admin/app/modules/home/services/admin_client.dart';
 import 'package:heyva_web_admin/app/modules/home/views/admin_page.dart';
 import 'package:heyva_web_admin/app/routes/app_pages.dart';
 import 'app/modules/home/controllers/menu_controller.dart';
 import 'app/modules/home/controllers/navigation_controllers.dart';
 import 'app/modules/home/views/admin_layout.dart';
-import 'constant/variabels.dart';
+import 'constant/variables.dart';
 import 'firebase_options.dart';
 import 'app/controllers/auth_controller.dart';
 import 'app/modules/splashscreen/splashscreen.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
   final authC = Get.put(AuthController(), permanent: true);
   final menuController = Get.put(AdminMenuController(), permanent: true);
   final navigationController = Get.put(NavigationController(), permanent: true);
+  // final adminController = Get.put(CreateController(), permanent: true);
 
   MyApp({Key? key}) : super(key: key);
 
@@ -51,7 +53,7 @@ class MyApp extends StatelessWidget {
                   // var box = GetStorage();
                   // authToken = box.read(Keys.loginAccessToken).toString();
                   // refreshToken = box.read(Keys.loginRefreshToken).toString();
-                  debugPrint("auth token $authToken");
+                  // debugPrint("auth token $authToken");
                   // var loginC = Get.put(LoginController());
                   // loginC.refresh();
 
@@ -73,13 +75,13 @@ class MyApp extends StatelessWidget {
                       ),
                     ),
                     // initialBinding: InitDependency(),
-                    builder: (context, child) => AdminLayout(child: child!),
-                    navigatorKey: navigationController.navigatorKey,
-                    onGenerateRoute: toGenerateRoute,
-                    initialRoute: adminPageRoute,
+                    // builder: (context, child) => AdminLayout(child: child!),
+                    // navigatorKey: navigationController.navigatorKey,
+                    // onGenerateRoute: toGenerateRoute,
+                    // initialRoute: adminPageRoute,
                     // initialRoute: dashboardPageRoute,
-                    // initialRoute: AppPages.INITIAL,
-                    // getPages: AppPages.routes,
+                    initialRoute: AppPages.INITIAL,
+                    getPages: AppPages.routes,
                   );
                 });
           }

@@ -5,6 +5,7 @@ import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:heyva_web_admin/app/modules/others/views/others_page.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/admin_layout.dart';
+import '../modules/home/views/dashboard_view.dart';
 import '../modules/login/bindings/login_binding.dart';
 import '../modules/login/views/login_view.dart';
 import '../modules/others/bindings/others_binding.dart';
@@ -48,7 +49,8 @@ class AppPages {
       name: _Paths.HOME,
       // page: () => const HomeViewAdmin(),
       // page: () => const ProviderScope(child: HomeViewAdmin()),
-      page: () => const HomeAdminView(),
+      // page: () => const HomeAdminView(),
+      page: () => DashboardPage(),
       binding: HomeBinding(),
     ),
     // GetPage(

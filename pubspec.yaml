@@ -26,6 +26,7 @@ dependencies:
   datetime_picker_formfield: ^2.0.1
   flutter_riverpod: ^2.3.5
   file_picker:
+  image_picker_web: ^3.0.0+1
 #  date_field: ^3.0.5
 
 dev_dependencies:
