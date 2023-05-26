@@ -4,15 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:heyva_web_admin/app/modules/home/controllers/admin_routes.dart';
-import 'package:heyva_web_admin/app/modules/home/controllers/init_dependency.dart';
-import 'package:heyva_web_admin/app/modules/home/services/admin_client.dart';
-import 'package:heyva_web_admin/app/modules/home/views/admin_page_bkp';
 import 'package:heyva_web_admin/app/routes/app_pages.dart';
 import 'app/modules/home/controllers/menu_controller.dart';
 import 'app/modules/home/controllers/navigation_controllers.dart';
-import 'app/modules/home/views/admin_layout.dart';
-import 'constant/variables.dart';
+import 'app/modules/login/controllers/login_controller.dart';
 import 'firebase_options.dart';
 import 'app/controllers/auth_controller.dart';
 import 'app/modules/splashscreen/splashscreen.dart';
@@ -30,6 +25,7 @@ void main(List<String> args) async {
 class MyApp extends StatelessWidget {
   var scrollController = ScrollController();
   final authC = Get.put(AuthController(), permanent: true);
+  final loginC = Get.put(LoginController(), permanent: true);
   final menuController = Get.put(AdminMenuController(), permanent: true);
   final navigationController = Get.put(NavigationController(), permanent: true);
   // final adminController = Get.put(CreateController(), permanent: true);

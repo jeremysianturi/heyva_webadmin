@@ -99,14 +99,14 @@ class LoginController extends GetxController {
   var response =
       LoginModel(success: "", data: null, message: "", error: "").obs;
 
-  refresh() async {
+  tokenRefresh() async {
     errorMessage.value = "";
     isLoading.value = true;
     var userId = box.read(Keys.loginID);
-    var refres = box.read(Keys.loginRefreshToken);
+    var refresh = box.read(Keys.loginRefreshToken);
     try {
       response.value =
-      (await _provider.refreshToken(refreshToken: refres, userId: userId))!;
+      (await _provider.refreshToken(refreshToken: refresh, userId: userId))!;
       isLoading.value = false;
 
       if (response.value.success == "Success") {

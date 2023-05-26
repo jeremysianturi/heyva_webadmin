@@ -1,20 +1,21 @@
-import 'dart:convert';
-import 'dart:js_interop';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' as milliseconds;
+import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:image_picker_web/image_picker_web.dart';
 import '../../../../constant/variables.dart';
 import '../../../../services/dio_services.dart';
+import '../../login/controllers/login_controller.dart';
 import '../model/create_article_data.dart';
 
 
 class AdminClient {
+  final Dio _dio = Dio();
   Dio init() {
-    Dio _dio = Dio();
+    // Dio _dio = Dio();
     // _dio.interceptors.add(toBeDefined());
     _dio.options = BaseOptions(
       baseUrl: heyApiBaseUrl,
@@ -26,13 +27,23 @@ class AdminClient {
     );
     return _dio;
   }
+  refreshOption() {
+    _dio.options = BaseOptions(
+      baseUrl: heyApiBaseUrl,
+      headers: {
+        'Authorization': 'Bearer $authToken',
+      },
+      connectTimeout: 5000.milliseconds,
+      receiveTimeout: 3000.milliseconds,
+    );
+  }
 }
 
 class CreateProvider {
   final Dio _createClient;
   CreateProvider(this._createClient);
 
-  Future<CreateModel?> getNewId({required Uint8List bytes, required String fileName}) async {
+  Future<CreateModel?> postNewAttachment({required Uint8List bytes, required String fileName}) async {
     CreateModel? resp;
 
     try {
@@ -76,7 +87,7 @@ class CreateProvider {
     } on DioError catch (err) {
       var message = err.response?.data['message'];
       var error = err.response?.data['error'];
-      // in case of message of error is 'Expired Signature' then will retry getNewId() after refresh the authToken
+      // in case of message of error is 'Expired Signature' then will retry postNewAttachment() after refresh the authToken
       resp = PostArticleModel(success: "", data: null, message: message, error: error);
     }
 
@@ -95,7 +106,7 @@ class CreateController extends GetxController {
     _create = CreateProvider(_client.init());
     super.onInit();
   }
-
+  final accessCtrl = Get.find<LoginController>();
   final TextEditingController titleCtrl = TextEditingController();
   final TextEditingController dateCtrl = TextEditingController();
   final TextEditingController categoryCtrl = TextEditingController();
@@ -114,9 +125,7 @@ class CreateController extends GetxController {
   late DateTime postDate;
   String imageFileName = '';
   String htmlFileName = '';
-  // Uint8List imageBytes = Uint8List(0);
   var imageBytes = Uint8List(0).obs;
-  // Uint8List htmlBytes = Uint8List(0);
   var htmlBytes = Uint8List(0).obs;
   List<String> tagsList = [];
 
@@ -129,15 +138,40 @@ class CreateController extends GetxController {
       errorPostMessage.value = '';
       isPostingImage = true;
         try {
-          getIdResponse.value = (await _create.getNewId(bytes: imageBytes.value, fileName: imageFileName))!;
+          getIdResponse.value = (await _create.postNewAttachment(bytes: imageBytes.value, fileName: imageFileName))!;
           isPostingImage = false;
-          attachmentId.value = getIdResponse.value.data!.id!;
-          if(attachmentId.isNotEmpty) {
-            gotAttachmentId.value = true;
+          if(getIdResponse.value.success == 'Success') {
+            attachmentId.value = getIdResponse.value.data!.id!;
+            if(attachmentId.isNotEmpty) {
+              gotAttachmentId.value = true;
+            }
+          } else {
+            // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
+            if(getIdResponse.value.message == 'Expired Signature') {
+              accessCtrl.tokenRefresh();
+              _client.refreshOption();
+              debugPrint('Access token has expired !');
+              isPostingImage = true;
+              try {
+                getIdResponse.value = (await _create.postNewAttachment(bytes: imageBytes.value, fileName: imageFileName))!;
+                isPostingImage = false;
+                if(getIdResponse.value.success == 'Success') {
+                  attachmentId.value = getIdResponse.value.data!.id!;
+                  if (attachmentId.isNotEmpty) {
+                    gotAttachmentId.value = true;
+                  }
+                } else {
+                  debugPrint('Bad access token signature and \nfailed to get attachment id: ${getIdResponse.value.message} !');
+                }
+              } catch (err) {
+                isPostingImage = false;
+                debugPrint("error  $err");
+              }
+            }
           }
         } catch (err) {
-            isPostingImage = false;
-            debugPrint("error  $err");
+          isPostingImage = false;
+          debugPrint("error  $err");
         }
     } else {
       debugPrint('Select a picture file first !');
