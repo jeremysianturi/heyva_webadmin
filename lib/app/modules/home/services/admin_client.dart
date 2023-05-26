@@ -112,21 +112,24 @@ class CreateController extends GetxController {
   late String artTitle;
   late String artTopic;
   late DateTime postDate;
-  late String imageFileName = '';
-  Uint8List imageBytes = Uint8List(0);
-  Uint8List htmlBytes = Uint8List(0);
+  String imageFileName = '';
+  String htmlFileName = '';
+  // Uint8List imageBytes = Uint8List(0);
+  var imageBytes = Uint8List(0).obs;
+  // Uint8List htmlBytes = Uint8List(0);
+  var htmlBytes = Uint8List(0).obs;
   List<String> tagsList = [];
 
   var getIdResponse =
       CreateModel(success: "", data: null, message: "", error: "").obs;
 
-  postGetArticleId() async {
+  getAttachmentId() async {
 
     if(isSelectedImage) {
       errorPostMessage.value = '';
       isPostingImage = true;
         try {
-          getIdResponse.value = (await _create.getNewId(bytes: imageBytes, fileName: imageFileName))!;
+          getIdResponse.value = (await _create.getNewId(bytes: imageBytes.value, fileName: imageFileName))!;
           isPostingImage = false;
           attachmentId.value = getIdResponse.value.data!.id!;
           if(attachmentId.isNotEmpty) {
@@ -144,7 +147,7 @@ class CreateController extends GetxController {
   var postArticleResponse =
       PostArticleModel(success: "", data: null, message: "", error: "").obs;
 
-  postCreateArticle(String id) async {
+  Future<String> postCreateArticle(String id) async {
 
     if(isSubmitReady()) {
       if (id == attachmentId.value) {
@@ -163,15 +166,19 @@ class CreateController extends GetxController {
           if(articleId.isNotEmpty) {
             gotPostingId.value = true;
           }
+          return articleId.value;
         } catch (err) {
           isPostingImage = false;
           debugPrint("error  $err");
+          return '';
         }
       } else {
         debugPrint('Article invalid !');
+        return '';
       }
     } else {
       debugPrint('Article not ready to submit yet !');
+      return '';
     }
   }
 
@@ -181,7 +188,7 @@ class CreateController extends GetxController {
     final data = mediaInfo?.data;
 
     if (data != null) {
-      imageBytes = data;
+      imageBytes.value = data;
       imageFileName = mediaInfo!.fileName!;
       isSelectedImage = true;
     }
@@ -189,42 +196,53 @@ class CreateController extends GetxController {
   }
 
   void getImageBytes(Uint8List data) {
-    data = imageBytes;
+    data = imageBytes.value;
   }
 
   void clearPhotoAndId() {
     attachmentId.value = '';
     gotAttachmentId.value = false;
     imageFileName = '';
+    imageBytes.value = Uint8List(0);
     isSelectedImage = false;
   }
 
-  Future<Uint8List?> uploadHtml() async {
+  Future<String?> uploadHtml() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
         withData: true,
         type: FileType.custom,
         allowedExtensions: ['txt', 'html']);
-    htmlBytes = Uint8List(0);
+    htmlBytes.value = Uint8List(0);
     if (result != null) {
       PlatformFile file = result.files.first;
-      htmlBytes = file.bytes!;
-      // widgetCtrl = "";
-      // for(var i=0 ; i < htmlBytes.buffer.asByteData().lengthInBytes; i++) {
-      //   widgetCtrl = widgetCtrl + String.fromCharCode(htmlBytes.buffer.asByteData().getUint8(i));
-      // }
+      htmlBytes.value = file.bytes!;
+      htmlFileName = file.name;
+      htmlCtrl.text = "";
+      for(var i=0 ; i < htmlBytes.value.buffer.asByteData().lengthInBytes; i++) {
+        htmlCtrl.text = htmlCtrl.text + String.fromCharCode(htmlBytes.value.buffer.asByteData().getUint8(i));
+      }
 
     } else {
       // User canceled the picker
+      return '';
     }
-    return htmlBytes;
+    return htmlFileName;
   }
 
   bool isSubmitReady() {
-    return (attachmentId != null && titleCtrl.value.text.isNotEmpty && htmlCtrl.value.text.isNotEmpty);
+    return (
+      attachmentId.value.isNotEmpty &&
+      titleCtrl.value.text.isNotEmpty &&
+      dateCtrl.value.text.isNotEmpty &&
+      categoryCtrl.value.text.isNotEmpty &&
+      htmlCtrl.value.text.isNotEmpty
+    );
   }
 
   clearCreatePage() {
     if(gotPostingId.value) {
+      imageFileName = '';
+      htmlFileName = '';
       attachmentId.value = '';
       articleId.value = '';
       isSelectedImage = false;
@@ -233,8 +251,8 @@ class CreateController extends GetxController {
       categoryCtrl.clear();
       dateCtrl.clear();
       htmlCtrl.clear();
-      imageBytes = Uint8List(0);
-      htmlBytes = Uint8List(0);
+      imageBytes.value = Uint8List(0);
+      htmlBytes.value = Uint8List(0);
     } else {
       debugPrint('Posting article is not done yet !');
     }

@@ -57,7 +57,7 @@ Route<dynamic> toGenerateRoute(RouteSettings settings){
     case dashboardPageRoute:
       return _getPageRoute(DashboardPage(), settings);
     case createPageRoute:
-      return _getPageRoute(const CreateArticlePage(), settings);
+      return _getPageRoute(CreateArticlePage(), settings);
     case updatePageRoute:
       return _getPageRoute(UpdateArticlePage(), settings);
     case readPageRoute:

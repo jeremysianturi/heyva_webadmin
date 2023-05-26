@@ -10,25 +10,13 @@ import '../services/admin_client.dart';
 import 'admin_common.dart';
 
 
-class CreateArticlePage extends StatefulWidget {
-  const CreateArticlePage({Key? key}) : super(key: key);
+class CreateArticlePage extends GetView<CreateController> {
+  CreateArticlePage({Key? key}) : super(key: key);
+  final createCtrl = Get.put(CreateController(), permanent: true);
+  final _formKey = GlobalKey<FormState>();
 
-  @override
-  _CreateArticlePage createState() => _CreateArticlePage();
-}
-
-
-class _CreateArticlePage extends State<CreateArticlePage> {
-  final createController = Get.put(CreateController(), permanent: true);
-  Uint8List imageValue = Uint8List(0);
-  Uint8List htmlValue = Uint8List(0);
-
-  final _pickedImages = <Image>[];
-  late String attArticleId;
-  late String postedArticleId;
-  // late final Image _imageWidget;
-  // late html.File _cloudFile;
-  late String fileName;
+  String attachmentId = '';
+  String articleId = '';
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +25,7 @@ class _CreateArticlePage extends State<CreateArticlePage> {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: Obx(() => Column(
           children: <Widget>[
             Row(
               children: <Widget>[
@@ -46,23 +34,6 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(width: 120,),
-                // ElevatedButton(
-                //   onPressed: () {},
-                //   style: ButtonStyle(
-                //     padding: MaterialStateProperty.all(const EdgeInsets.all(20)),
-                //     textStyle: MaterialStateProperty.all(
-                //       const TextStyle(fontSize: 16),
-                //     ),
-                //     backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
-                //     shape: MaterialStateProperty.all(
-                //       RoundedRectangleBorder(
-                //         borderRadius: BorderRadius.circular(10),
-                //       ),
-                //     ),
-                //   ),
-                //   child: const Text('Compose'),
-                // ),
-                // const SizedBox(width: 20,),
                 ElevatedButton(
                   onPressed: () async {
                     // check if all required information ready
@@ -71,22 +42,18 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                     //  - article Category :: tags
                     //  - date <> it may use system date time rather than selecting date from calendar
                     //  - article content [html]
-
-                    if(attArticleId.isNotEmpty) {
-                      if(createController.titleCtrl != null) {
-                        if(createController.htmlCtrl != null) {
-                          await createController.postCreateArticle(attArticleId);
-                          postedArticleId = createController.articleId.value;
-                          if(postedArticleId.isNotEmpty) {
-                            createController.clearCreatePage();
-                            setState(() {
-                              imageValue = Uint8List(0);
-                              htmlValue = Uint8List(0);
-                              debugPrint('Posting article DONE !');
-                            });
-                          }
-                        }
+                    if(attachmentId.isNotEmpty) {
+                      articleId = await createCtrl.postCreateArticle(attachmentId);
+                      if(articleId.isNotEmpty) {
+                        createCtrl.clearCreatePage();
+                        articleId = '';
+                        attachmentId = '';
+                        debugPrint('Posting article DONE !');
+                        // Launch a snackbar message
                       }
+                    } else {
+                      // Launch a snackbar message
+                      debugPrint('Please request attachment id first !');
                     }
                   },
                   style: ButtonStyle(
@@ -133,9 +100,8 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                     child: TextField(
                       onChanged: (text) {
-                        // debugPrint("Article title: ${titleEditingController.text}");
                       },
-                      controller: createController.titleCtrl,
+                      controller: createCtrl.titleCtrl,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
@@ -169,9 +135,8 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                     child: TextField(
                       onChanged: (text) {
-                        // debugPrint("Article category: ${categoryEditingController.text}");
                       },
-                      controller: createController.categoryCtrl,
+                      controller: createCtrl.categoryCtrl,
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(
                           borderSide: BorderSide.none,
@@ -203,7 +168,7 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    child: SelectDate(controller: createController.dateCtrl,),
+                    child: SelectDate(controller: createCtrl.dateCtrl,),
                   ),
                 ),
               ],
@@ -225,17 +190,21 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  createController.isSelectedImage ?
-                    createController.gotAttachmentId.value ?
+                  createCtrl.isSelectedImage ?
+                    createCtrl.gotAttachmentId.value ?
                       ElevatedButton(
                         onPressed: () {
-                          createController.clearPhotoAndId();
-                          setState(() {
-                            imageValue = Uint8List(0);
-                          });
+                          createCtrl.clearPhotoAndId();
+                          // setState(() {
+                            attachmentId = '';
+                          // });
                         },
                         style: ButtonStyle(
-                          padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0)),
+                          padding: MaterialStateProperty.all(
+                              const EdgeInsets.symmetric(
+                                  horizontal: 10.0,
+                                  vertical: 10.0)
+                          ),
                           textStyle: MaterialStateProperty.all(
                             const TextStyle(fontSize: 16),
                           ),
@@ -256,16 +225,18 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                       )
                       : ElevatedButton(
                       onPressed: () async {
-                        await createController.postGetArticleId();
-                        attArticleId = createController.attachmentId.value;
-                        if(attArticleId.isNotEmpty) {
-                          setState(() {
-                            // debugPrint('Getting pregnant tag: ${tagsList['getting pregnant']}');
-                          });
+                        await createCtrl.getAttachmentId();
+                        attachmentId = createCtrl.attachmentId.value;
+                        if(attachmentId.isEmpty) {
+                          // Error handler
                         }
                       },
                       style: ButtonStyle(
-                        padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0)),
+                        padding: MaterialStateProperty.all(
+                          const EdgeInsets.symmetric(
+                            horizontal: 10.0,
+                            vertical: 10.0)
+                        ),
                         textStyle: MaterialStateProperty.all(
                           const TextStyle(fontSize: 16),
                         ),
@@ -286,15 +257,18 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                     )
                     : ElevatedButton(
                       onPressed: () async {
-                        var fileName = await createController.selectImage();
-                        if(fileName != null) {
-                          setState(() {
-                            imageValue = createController.imageBytes;
-                          });
+                        await createCtrl.selectImage();
+                        if(createCtrl.imageFileName.isEmpty) {
+                          // Launch a snackbar message
+                          // Error handler
                         }
                       },
                       style: ButtonStyle(
-                        padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0)),
+                        padding: MaterialStateProperty.all(
+                            const EdgeInsets.symmetric(
+                                horizontal: 10.0,
+                                vertical: 10.0)
+                        ),
                         textStyle: MaterialStateProperty.all(
                           const TextStyle(fontSize: 16),
                         ),
@@ -313,57 +287,74 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                         ],
                       ),
                     ),
+
                   const SizedBox(width: 20),
-                  createController.isSelectedImage ?
-                          createController.gotAttachmentId.value ?
-                            const Text('')
-                            : ElevatedButton(
-                            onPressed: () async {
-                              createController.clearPhotoAndId();
-                              var fileName = await createController.selectImage();
-                              if(fileName != null) {
-                                setState(() {
-                                  imageValue = createController.imageBytes;
-                                });
-                              }
-                            },
-                            style: ButtonStyle(
-                              padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0)),
-                              textStyle: MaterialStateProperty.all(
-                                const TextStyle(fontSize: 16),
-                              ),
-                              backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ),
-                            child: const Row(
-                              children: <Widget>[
-                                Icon(Icons.file_upload),
-                                SizedBox(width: 5),
-                                Text('Change Photo')
-                              ],
-                            ),
-                          )
+                  createCtrl.imageFileName.isNotEmpty ?
+                    Text(
+                      createCtrl.imageFileName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic),
+                    )
+                    : const Text(''),
+
+                  const SizedBox(width: 20),
+                  createCtrl.isSelectedImage ?
+                    createCtrl.gotAttachmentId.value ?
+                      const Text('')
+                      : ElevatedButton(
+                        onPressed: () async {
+                          createCtrl.clearPhotoAndId();
+                          await createCtrl.selectImage();
+                          if(createCtrl.imageFileName.isEmpty) {
+                            // Launch a snackbar message
+                            // Error handler
+                          }
+                        },
+                        style: ButtonStyle(
+                          padding: MaterialStateProperty.all(
+                              const EdgeInsets.symmetric(
+                                  horizontal: 10.0,
+                                  vertical: 10.0)
+                          ),
+                          textStyle: MaterialStateProperty.all(
+                            const TextStyle(fontSize: 16),
+                          ),
+                        backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                      child: const Row(
+                        children: <Widget>[
+                          Icon(Icons.file_upload),
+                          SizedBox(width: 5),
+                          Text('Change Photo')
+                        ],
+                      ),
+                    )
                       : const Text(''),
                   Expanded(
-                    child: createController.gotAttachmentId.value ? Text('Id: ${createController.attachmentId}') : const Text(""),
+                    child: createCtrl.gotAttachmentId.value ?
+                      Text('Id: ${createCtrl.attachmentId}')
+                      : const Text(""),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20,),
 
-            // imageValue.isEmpty ?
-            createController.imageBytes.isEmpty ?
-              const Text("Press to select photo.", style: TextStyle(color: ColorApp.grey_container),)
+            createCtrl.imageBytes.value.isEmpty ?
+              const Text(
+                "Press to select photo.",
+                style: TextStyle(color: ColorApp.grey_container)
+              )
               : SizedBox(
                 height: 400,
                 width: width / 2,
-                // child: Image.memory(imageValue)
-                child: Image.memory(createController.imageBytes),
+                child: Image.memory(createCtrl.imageBytes.value),
               ),
 
             const SizedBox(height: 20,),
@@ -384,18 +375,16 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                   const SizedBox(width: 10),
                   ElevatedButton(
                     onPressed: () async {
-                      htmlValue = (await createController.uploadHtml())!;
-                      if(htmlValue.isNotEmpty) {
-                        setState(() {
-                          createController.htmlCtrl.text = "";
-                          for(var i=0 ; i < htmlValue.buffer.asByteData().lengthInBytes; i++) {
-                            createController.htmlCtrl.text = createController.htmlCtrl.text + String.fromCharCode(htmlValue.buffer.asByteData().getUint8(i));
-                          }
-                        });
+                      await createCtrl.uploadHtml();
+                      if(createCtrl.htmlBytes.value.isEmpty) {
+                        // Launch a snackbar message
+                        // Error handler
                       }
                     },
                     style: ButtonStyle(
-                      padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0)),
+                      padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0)
+                      ),
                       textStyle: MaterialStateProperty.all(
                         const TextStyle(fontSize: 16),
                       ),
@@ -416,9 +405,18 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                   ),
                   const SizedBox(width: 20),
                   Expanded(
-                      child: htmlValue.isEmpty ?
-                        const Text("Upload or edit article html.", style: TextStyle(color: ColorApp.grey_container),)
-                        : const Text("Loaded!")
+                      child: createCtrl.htmlFileName.isEmpty ?
+                        const Text(
+                          "Upload or edit article html.",
+                          style: TextStyle(color: ColorApp.grey_container),
+                        )
+                        : Text(
+                          createCtrl.htmlFileName,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontStyle: FontStyle.italic
+                          ),
+                        )
                   ),
                 ],
               ),
@@ -431,9 +429,8 @@ class _CreateArticlePage extends State<CreateArticlePage> {
               // color: ColorApp.grey_divider,
               child: TextField(
                 onTap: () {
-                  // debugPrint("Article html: ${htmlEditingController.text}");
                 },
-                controller: createController.htmlCtrl,
+                controller: createCtrl.htmlCtrl,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(
                     borderSide: BorderSide.none,
@@ -447,7 +444,6 @@ class _CreateArticlePage extends State<CreateArticlePage> {
                 cursorColor: Colors.black,
                 maxLines: 1000,
                 style: const TextStyle(color: ColorApp.grey_font),
-                // expands: true,
               ),
             ),
 
@@ -455,6 +451,6 @@ class _CreateArticlePage extends State<CreateArticlePage> {
           ],
         ),
       ),
-    );
+    ));
   }
 }

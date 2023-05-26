@@ -7,7 +7,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:heyva_web_admin/app/modules/home/controllers/admin_routes.dart';
 import 'package:heyva_web_admin/app/modules/home/controllers/init_dependency.dart';
 import 'package:heyva_web_admin/app/modules/home/services/admin_client.dart';
-import 'package:heyva_web_admin/app/modules/home/views/admin_page.dart';
+import 'package:heyva_web_admin/app/modules/home/views/admin_page_bkp';
 import 'package:heyva_web_admin/app/routes/app_pages.dart';
 import 'app/modules/home/controllers/menu_controller.dart';
 import 'app/modules/home/controllers/navigation_controllers.dart';
