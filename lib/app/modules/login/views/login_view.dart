@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:heyva_web_admin/app/modules/forgotpassword/views/forgotpass_view.dart';
-import 'package:heyva_web_admin/app/modules/termsofservice/views/termsofservice_view.dart';
+import 'package:heyva_web_admin/app/routes/app_pages.dart';
 import 'package:loading_overlay/loading_overlay.dart';
+
 import '../../../../constant/colors.dart';
 import '../../../../constant/strings.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../widgets/reusable_orange_button_with_trailing_icon.dart';
-import '../../privacypolicy/views/privacypolicy_view.dart';
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -43,19 +42,22 @@ class LoginView extends GetView<LoginController> {
                         children: [
                           TextButton(
                             onPressed: () {
-                              Get.to(TermsOfServiceView());
+                              // Get.to(TermsOfServiceView());
+                              Get.toNamed(Routes.TERMS_OF_SERVICE);
                             },
                             child: const Text("Go to Terms of Service"),
                           ),
                           TextButton(
                             onPressed: () {
-                              Get.to(PrivacyPolicyView());
+                              // Get.to(PrivacyPolicyView());
+                              Get.toNamed(Routes.PRIVACY_POLICY);
                             },
                             child: const Text("Go to Privacy Policy"),
                           ),
                           TextButton(
                             onPressed: () {
-                              Get.to(ForgotPasswordView());
+                              // Get.to(ForgotPasswordView());
+                              Get.toNamed(Routes.FORGOT_PASSWORD);
                             },
                             child: const Text("Go to Forgot Password"),
                           ),

@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
+
 import '../models/privacypolicy_model.dart';
 
 class PrivacyPolicyProvider {

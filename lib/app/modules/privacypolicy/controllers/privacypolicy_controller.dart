@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:get_storage/get_storage.dart';
+
 import '../../../../constant/keys.dart';
 import '../../../../services/dio_services.dart';
 import '../models/privacypolicy_model.dart';
@@ -43,7 +43,7 @@ class PrivacyPolicyController extends GetxController {
 
       if (privacyPolicyResponse.value.success == "Success") {
         var data = privacyPolicyResponse.value.data;
-        debugPrint("check value privacy policy: ${privacyPolicyResponse.value.data}");
+        // debugPrint("check value privacy policy: ${privacyPolicyResponse.value.data}");
         box.write(Keys.privacyPolicyText, data?.textContent);
       } else {
         errorMessage.value = privacyPolicyResponse.value.message ?? "Error Message";

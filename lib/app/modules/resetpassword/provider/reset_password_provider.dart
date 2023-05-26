@@ -8,19 +8,22 @@ class ResetPasswordProvider {
 
   ResetPasswordProvider(this._client);
 
-  Future<ResetPasswordModel?> Login({required username, required password}) async {
+  Future<ResetPasswordModel?> resetPass(
+      {required newPass, required confPass, required token}) async {
     ResetPasswordModel? res;
     try {
-      Response response = await _client.post(
-        '/api/v1/users/login',
-        data: {"username": username, "password": password},
+      Response response = await _client.put(
+        '/api/v1/users/reset-password/$token',
+        data: {"new_password": newPass, "confirm_new_password": confPass},
       );
       debugPrint('response data: ${response.data}');
       res = ResetPasswordModel.fromJson(response.data);
     } on DioError catch (e) {
       var message = e.response?.data['message'];
       var error = e.response?.data['error'];
-      res = ResetPasswordModel(success: "", data: null, message: message, error: error);
+      debugPrint("message error $message");
+      res = ResetPasswordModel(
+          success: "", data: null, message: message, error: error);
     }
     return res;
   }

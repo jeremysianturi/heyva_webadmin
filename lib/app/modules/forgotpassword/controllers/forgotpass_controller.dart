@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_rx/src/rx_types/rx_types.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:heyva_web_admin/app/modules/forgotpassword/model/forgotpass_model.dart';
 import 'package:heyva_web_admin/app/modules/forgotpassword/providers/forgotpass_provider.dart';

@@ -1,8 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:heyva_web_admin/app/modules/forgotpassword/controllers/forgotpass_controller.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 
@@ -11,7 +8,6 @@ import '../../../../constant/strings.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/reusable_orange_button_with_trailing_icon.dart';
-import '../../termsofservice/views/termsofservice_view.dart';
 
 class ForgotPasswordView extends GetView<ForgotPasswordController> {
   ForgotPasswordView({Key? key}) : super(key: key);
@@ -44,7 +40,8 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                     child: Container(
                       child: TextButton(
                         onPressed: () {
-                          Get.to(TermsOfServiceView());
+                          // Get.to(TermsOfServiceView());
+                          Get.toNamed(Routes.TERMS_OF_SERVICE);
                         },
                         child: const Text("Go to Terms of Service"),
                       ),

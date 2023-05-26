@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:heyva_web_admin/constant/variabels.dart';
+
 import '../constant/keys.dart';
 import 'logging.dart';
 
@@ -10,7 +11,7 @@ class DioClient {
   Dio init() {
     var box = GetStorage();
     debugPrint("token ${box.read(Keys.loginAccessToken)}");
-    var token = box.read(Keys.loginAccessToken).toString();
+    // var token = box.read(Keys.loginAccessToken).toString();
     Dio _dio = Dio();
     _dio.interceptors.add(Logging());
     _dio.options = BaseOptions(

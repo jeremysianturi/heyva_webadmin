@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+
 import '../controllers/resetpassword_controller.dart';
 
 class ResetPasswordBinding extends Bindings {

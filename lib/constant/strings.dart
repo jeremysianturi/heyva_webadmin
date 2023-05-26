@@ -5,6 +5,7 @@ class Strings {
   static const String heyva = "Heyva";
   static const String heyva_capital = "HEYVA";
   static const String login = "Login";
+  static const String changeYourPass = "change your pass";
   static const String new_acc_text = "Create New\nAccount";
   static const String continue_email = "Continue with Email";
   static const String continue_google = "Continue with Google";
