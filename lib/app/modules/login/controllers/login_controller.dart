@@ -118,7 +118,8 @@ class LoginController extends GetxController {
         authToken = box.read(Keys.loginAccessToken).toString();
         refreshToken = box.read(Keys.loginRefreshToken).toString();
         Future.delayed(800.milliseconds);
-        Get.toNamed(Routes.PRIVACY_POLICY);
+        // Below seems just for test
+        // Get.toNamed(Routes.PRIVACY_POLICY);
       } else {
         errorMessage.value = loginResponse.value.message ?? "Error Message";
       }

@@ -14,6 +14,7 @@ class CreateArticlePage extends GetView<CreateController> {
 
   String attachmentId = '';
   String articleId = '';
+  late List<String?> tagsList;
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +128,36 @@ class CreateArticlePage extends GetView<CreateController> {
                     ),
                   ),
                 ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    tagsList = await createCtrl.getArticleTagsList();
+                    debugPrint('$tagsList');
+                  },
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(
+                        const EdgeInsets.symmetric(
+                            horizontal: 10.0,
+                            vertical: 10.0)
+                    ),
+                    textStyle: MaterialStateProperty.all(
+                      const TextStyle(fontSize: 16),
+                    ),
+                    backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  child: const Row(
+                    children: <Widget>[
+                      Icon(Icons.app_registration),
+                      SizedBox(width: 5),
+                      Text('Tags List')
+                    ],
+                  ),
+                ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -192,9 +223,7 @@ class CreateArticlePage extends GetView<CreateController> {
                       ElevatedButton(
                         onPressed: () {
                           createCtrl.clearPhotoAndId();
-                          // setState(() {
-                            attachmentId = '';
-                          // });
+                          attachmentId = '';
                         },
                         style: ButtonStyle(
                           padding: MaterialStateProperty.all(

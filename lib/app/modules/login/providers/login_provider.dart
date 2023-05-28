@@ -31,8 +31,7 @@ class LoginProvider {
     LoginModel? res;
     try {
       Response response = await _client.post(
-        // '/api/v1/users/refresh-token',
-        '$heyApiBaseUrl/api/v1/users/login',
+        '/api/v1/users/refresh-token',
         data: {"id": userId, "refresh_token": refreshToken},
       );
       debugPrint('response data: ${response.data}');

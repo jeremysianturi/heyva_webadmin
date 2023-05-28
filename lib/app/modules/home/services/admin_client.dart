@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:js_interop';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
@@ -14,13 +16,18 @@ import '../model/create_article_data.dart';
 
 class AdminClient {
   final Dio _dio = Dio();
+  late String accessToken;
+
   Dio init() {
     // Dio _dio = Dio();
     // _dio.interceptors.add(toBeDefined());
+    accessToken = authToken;
+    // For refreshToken test
+    // accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkZW50aWZpZXIiOiJmNTA0M2Q1OS1hY2QxLTQ5MmUtODAzOC0wZmUwMDMwNmYwNTEiLCJleHAiOjE2ODQ1NzIzMzEsImlhdCI6MTY4NDU2ODczMS40NDU0OTQsInNjb3BlIjoiQUNDRVNTIiwidXNlcm5hbWUiOiJhZG1pbl9oZXl2YSIsImVtYWlsIjpudWxsLCJwaG9uZV9udW1iZXIiOm51bGwsInByb2ZpbGVfY29kZSI6IjIwMjMwMzE2MDAwMDAwMTYiLCJyb2xlcyI6WyI3NjM5ZWI4OS01Yzc2LTQwMjgtYTliZi03MGQwMDA4ZjcxNGUiLCJlZjM2MmRhZS02NTc5LTQzOGYtYTA5OS0xNDhkZWRmYzI2YjAiXX0.XY3AAO6kvuyI3V_LRi1QV_nKhNcYWe2prPAFlIZWZVk";
     _dio.options = BaseOptions(
       baseUrl: heyApiBaseUrl,
       headers: {
-        'Authorization': 'Bearer $authToken',
+        'Authorization': 'Bearer $accessToken',
       },
       connectTimeout: 5000.milliseconds,
       receiveTimeout: 3000.milliseconds,
@@ -28,10 +35,11 @@ class AdminClient {
     return _dio;
   }
   refreshOption() {
+    accessToken = authToken;
     _dio.options = BaseOptions(
       baseUrl: heyApiBaseUrl,
       headers: {
-        'Authorization': 'Bearer $authToken',
+        'Authorization': 'Bearer $accessToken',
       },
       connectTimeout: 5000.milliseconds,
       receiveTimeout: 3000.milliseconds,
@@ -43,8 +51,8 @@ class CreateProvider {
   final Dio _createClient;
   CreateProvider(this._createClient);
 
-  Future<CreateModel?> postNewAttachment({required Uint8List bytes, required String fileName}) async {
-    CreateModel? resp;
+  Future<AttArticleModel?> postNewAttachment({required Uint8List bytes, required String fileName}) async {
+    AttArticleModel? resp;
 
     try {
       FormData formData = FormData.fromMap({
@@ -52,14 +60,15 @@ class CreateProvider {
         MultipartFile.fromBytes(bytes, filename: fileName),
       });
       Response response = await _createClient.post("/api/v1/article-attachment/create", data: formData);
-      resp = CreateModel.fromJson(response.data);
+      resp = AttArticleModel.fromJson(response.data);
       // debugPrint('Article id: ${resp.data?.id}');
 
     } on DioError catch (err) {
+      debugPrint('POST fail with result: ${err.response?.statusCode}');
       var message = err.response?.data['message'];
       var error = err.response?.data['error'];
       // in case of message of error is 'Expired Signature' then will retry getNewId() after refresh the authToken
-      resp = CreateModel(success: "", data: null, message: message, error: error);
+      resp = AttArticleModel(success: "", data: null, message: message, error: error);
     }
 
     return resp;
@@ -85,10 +94,36 @@ class CreateProvider {
       resp = PostArticleModel.fromJson(response.data);
 
     } on DioError catch (err) {
+      debugPrint('POST fail with result: ${err.response?.statusCode}');
       var message = err.response?.data['message'];
       var error = err.response?.data['error'];
       // in case of message of error is 'Expired Signature' then will retry postNewAttachment() after refresh the authToken
       resp = PostArticleModel(success: "", data: null, message: message, error: error);
+    }
+
+    return resp;
+  }
+
+  Future<TagsArticleModel?> getArticleTags() async {
+    TagsArticleModel? resp;
+
+    try {
+      FormData formData = FormData.fromMap({
+      });
+      Response response = await _createClient.get(
+        // "/api/v1/dictionary/get-by-type?type=INTERESTS_TAG&search="
+        "/api/v1/dictionary/get-by-type?",
+        queryParameters: {'type': 'INTERESTS_TAG', 'search': ''}
+      );
+      resp = TagsArticleModel.fromJson(response.data);
+      debugPrint('Get Tags: ${resp.success}');
+
+    } on DioError catch (err) {
+      debugPrint('POST fail with result: ${err.response?.statusCode}');
+      var message = err.response?.data['message'];
+      var error = err.response?.data['error'];
+      // in case of message of error is 'Expired Signature' then will retry getNewId() after refresh the authToken
+      resp = TagsArticleModel(success: "", data: null, message: message, error: error);
     }
 
     return resp;
@@ -114,10 +149,12 @@ class CreateController extends GetxController {
 
   var isPostingImage = false;
   var isPostingArticle = false;
+  var isGettingTags = false;
   bool isSelectedImage = false;
   var errorPostMessage = ''.obs;
   var gotAttachmentId = false.obs;
   var gotPostingId = false.obs;
+  var gotTagsList = false.obs;
   var attachmentId = ''.obs;
   var articleId = ''.obs;
   late String artTitle;
@@ -128,9 +165,12 @@ class CreateController extends GetxController {
   var imageBytes = Uint8List(0).obs;
   var htmlBytes = Uint8List(0).obs;
   List<String> tagsList = [];
+  late List<dynamic> articleTags;
+  late List<String?> tagsId;
+  late List<String?> tagNames;
 
   var getIdResponse =
-      CreateModel(success: "", data: null, message: "", error: "").obs;
+      AttArticleModel(success: "", data: null, message: "", error: "").obs;
 
   getAttachmentId() async {
 
@@ -150,7 +190,6 @@ class CreateController extends GetxController {
             if(getIdResponse.value.message == 'Expired Signature') {
               accessCtrl.tokenRefresh();
               _client.refreshOption();
-              debugPrint('Access token has expired !');
               isPostingImage = true;
               try {
                 getIdResponse.value = (await _create.postNewAttachment(bytes: imageBytes.value, fileName: imageFileName))!;
@@ -213,6 +252,31 @@ class CreateController extends GetxController {
     } else {
       debugPrint('Article not ready to submit yet !');
       return '';
+    }
+  }
+
+  var getTagsResponse =
+      TagsArticleModel(success: "", data: null, message: "", error: "").obs;
+
+  Future<List<String?>> getArticleTagsList() async {
+
+    errorPostMessage.value = '';
+    isGettingTags = true;
+    debugPrint('Test getting article tags list !');
+
+    try {
+      getTagsResponse.value = (await _create.getArticleTags())!;
+      isGettingTags = false;
+      debugPrint('Test getting article tags list ... ${getTagsResponse.value.success} !');
+      articleTags = getTagsResponse.value.data?.toList() as List<dynamic>;
+      // later will map<tagNames, tagsId) for selecting tagId based on selected tagName for posting article parameters
+      tagsId = getTagsResponse.value.data!.map((e) => e.id).toList();
+      tagNames = getTagsResponse.value.data!.map((e) => e.name).toList();
+      return tagNames;
+    } catch (err) {
+      isGettingTags = false;
+      debugPrint("error  $err");
+      return ['Error dio.get !'];
     }
   }
 
