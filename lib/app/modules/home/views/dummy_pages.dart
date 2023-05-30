@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../../controllers/auth_controller.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({Key? key}) : super(key: key);
@@ -48,7 +51,8 @@ class SettingPage extends StatelessWidget {
 }
 
 class ExitPage extends StatelessWidget {
-  const ExitPage({Key? key}) : super(key: key);
+  ExitPage({Key? key}) : super(key: key);
+  final logoutCtrl = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +63,7 @@ class ExitPage extends StatelessWidget {
               childAspectRatio: 10,
               children: [
                 GestureDetector(
-                  onTap: () {},
+                  // onTap: () {},
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                     child: TextFormField(
@@ -77,15 +81,18 @@ class ExitPage extends StatelessWidget {
               childAspectRatio: 2,
               children: [
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    logoutCtrl.logout();
+                  },
                   child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'EXIT',
-                      ),
-                    ),
+                    child: Text('Logout')
+                    // child: TextField(
+                    //   decoration: InputDecoration(
+                    //     border: OutlineInputBorder(),
+                    //     labelText: 'EXIT',
+                    //   ),
+                    // ),
                   ),
                 ),
               ]

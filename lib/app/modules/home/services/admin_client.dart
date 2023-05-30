@@ -165,9 +165,11 @@ class CreateController extends GetxController {
   var imageBytes = Uint8List(0).obs;
   var htmlBytes = Uint8List(0).obs;
   List<String> tagsList = [];
+  List<TagsData>? fullTags = [];
   late List<dynamic> articleTags;
   late List<String?> tagsId;
   late List<String?> tagNames;
+  List<TagIdName> tagIdNames = [];
 
   var getIdResponse =
       AttArticleModel(success: "", data: null, message: "", error: "").obs;
@@ -258,7 +260,7 @@ class CreateController extends GetxController {
   var getTagsResponse =
       TagsArticleModel(success: "", data: null, message: "", error: "").obs;
 
-  Future<List<String?>> getArticleTagsList() async {
+  Future<List<TagIdName>?> initArticleTagsList() async {
 
     errorPostMessage.value = '';
     isGettingTags = true;
@@ -267,16 +269,15 @@ class CreateController extends GetxController {
     try {
       getTagsResponse.value = (await _create.getArticleTags())!;
       isGettingTags = false;
-      debugPrint('Test getting article tags list ... ${getTagsResponse.value.success} !');
-      articleTags = getTagsResponse.value.data?.toList() as List<dynamic>;
-      // later will map<tagNames, tagsId) for selecting tagId based on selected tagName for posting article parameters
-      tagsId = getTagsResponse.value.data!.map((e) => e.id).toList();
-      tagNames = getTagsResponse.value.data!.map((e) => e.name).toList();
-      return tagNames;
+      fullTags = getTagsResponse.value.data?.toList();
+      tagsId = fullTags!.map((e) => e.id).toList();
+      tagNames = fullTags!.map((e) => e.name).toList();
+      tagIdNames = fullTags!.map((e) => (TagIdName(id: e.id!, name: e.name!))).toList();
+      return tagIdNames;
     } catch (err) {
       isGettingTags = false;
       debugPrint("error  $err");
-      return ['Error dio.get !'];
+      return null;
     }
   }
 

@@ -200,6 +200,9 @@ class LoginView extends GetView<LoginController> {
                             FocusScope.of(context).requestFocus(FocusNode());
                             if (loginController.validateData) {
                               loginController.postLogin();
+                              loginController.emailC.clear();
+                              loginController.passC.clear();
+                              Get.off(const AdminLayout());
                             }
                           },
                         )

@@ -65,7 +65,7 @@ Route<dynamic> toGenerateRoute(RouteSettings settings){
     case settingPageRoute:
       return _getPageRoute(const SettingPage(), settings);
     case logoutPageRoute:
-      return _getPageRoute(const ExitPage(), settings);
+      return _getPageRoute(ExitPage(), settings);
     default:
       return _getPageRoute(DashboardPage(), settings);
 

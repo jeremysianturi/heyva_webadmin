@@ -249,3 +249,9 @@ Map<String, dynamic> _$TagsDataToJson(TagsData instance) => <String, dynamic>{
   'icon': instance.icon,
   'value': instance.value,
 };
+
+class TagIdName {
+  String id;
+  String name;
+  TagIdName({required this.id, required this.name});
+}

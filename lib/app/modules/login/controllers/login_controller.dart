@@ -76,7 +76,9 @@ class LoginController extends GetxController {
         refreshToken = box.read(Keys.loginRefreshToken).toString();
         Future.delayed(800.milliseconds);
         // Get.toNamed(Routes.PRIVACY_POLICY);
-        Get.off(const AdminLayout());
+        // emailC.clear();
+        // passC.clear();
+        // Get.off(const AdminLayout());
       } else {
         if (loginResponse.value.message
             .toString()

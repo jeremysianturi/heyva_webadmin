@@ -2,10 +2,18 @@ import 'package:get/get.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:heyva_web_admin/app/modules/home/controllers/menu_controller.dart';
+import 'package:heyva_web_admin/app/modules/home/model/create_article_data.dart';
 import 'package:heyva_web_admin/constant/colors.dart';
+import '../../login/controllers/login_controller.dart';
 import '../services/admin_client.dart';
 import 'admin_common.dart';
 
+class TagList {
+  int id;
+  String name;
+
+  TagList({required this.id, required this.name});
+}
 
 class CreateArticlePage extends GetView<CreateController> {
   CreateArticlePage({Key? key}) : super(key: key);
@@ -14,7 +22,11 @@ class CreateArticlePage extends GetView<CreateController> {
 
   String attachmentId = '';
   String articleId = '';
-  late List<String?> tagsList;
+  late List<String?> tagNames;
+  late List<TagIdName>? tagIdNames;
+  late List<String?> selectedNames;
+  var tagList = <TagList> [];
+  var selectedTags =  <TagList> [];
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +37,14 @@ class CreateArticlePage extends GetView<CreateController> {
         padding: const EdgeInsets.all(16.0),
         child: Obx(() => Column(
           children: <Widget>[
+            // Header admin page title and submit dispatching button
             Row(
               children: <Widget>[
                 Text(
                   pageName,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(width: 120,),
+                const SizedBox(width: 64,),
                 ElevatedButton(
                   onPressed: () async {
                     // check if all required information ready
@@ -81,10 +94,11 @@ class CreateArticlePage extends GetView<CreateController> {
                 ),
               ],
             ),
+            // Article title field
             Row(
               children: <Widget>[
                 const SizedBox(
-                  width: 200,
+                  width: 160,
                   child: Text(
                     'Title',
                     style: TextStyle(
@@ -116,12 +130,13 @@ class CreateArticlePage extends GetView<CreateController> {
                 ),
               ],
             ),
+            // Article interest tags
             Row(
               children: <Widget>[
                 const SizedBox(
-                  width: 200,
+                  width: 160,
                   child: Text(
-                    'Category',
+                    'Article Tags',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.normal,
@@ -129,10 +144,14 @@ class CreateArticlePage extends GetView<CreateController> {
                   ),
                 ),
                 const SizedBox(width: 10),
+                // this is just test requesting Interest Tags list
+                // once confirmed this will be used for Multi_Select Chip
                 ElevatedButton(
                   onPressed: () async {
-                    tagsList = await createCtrl.getArticleTagsList();
-                    debugPrint('$tagsList');
+                    tagIdNames = await createCtrl.initArticleTagsList();
+                    for (var e in tagIdNames!) {
+                      debugPrint('id: ${e.id.toString()}\nname: ${e.name.toString()}');
+                    }
                   },
                   style: ButtonStyle(
                     padding: MaterialStateProperty.all(
@@ -170,7 +189,7 @@ class CreateArticlePage extends GetView<CreateController> {
                           borderSide: BorderSide.none,
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
-                        hintText: 'Article category',
+                        hintText: 'Select relevant tags',
                         fillColor: CupertinoColors.secondarySystemFill,
                         filled: true,
                         hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
@@ -181,10 +200,14 @@ class CreateArticlePage extends GetView<CreateController> {
                 ),
               ],
             ),
+
+            // Multi-select chips for tags selection
+
+            // Date creation
             Row(
               children: <Widget>[
                 const SizedBox(
-                  width: 200,
+                  width: 160,
                   child: Text(
                     'Date',
                     style: TextStyle(
@@ -201,14 +224,13 @@ class CreateArticlePage extends GetView<CreateController> {
                 ),
               ],
             ),
-
-            // the following may use Obx mechanism instead of setState
+            // Photo selection
             Padding(
               padding: const EdgeInsets.only(top:8.0, right: 8.0, bottom: 8.0),
               child: Row(
                 children: <Widget>[
                   const SizedBox(
-                    width: 200,
+                    width: 160,
                     child: Text(
                       'Photo',
                       style: TextStyle(
@@ -371,7 +393,7 @@ class CreateArticlePage extends GetView<CreateController> {
               ),
             ),
             const SizedBox(height: 20,),
-
+            // Photo widget container
             createCtrl.imageBytes.value.isEmpty ?
               const Text(
                 "Press to select photo.",
@@ -379,17 +401,25 @@ class CreateArticlePage extends GetView<CreateController> {
               )
               : SizedBox(
                 height: 400,
-                width: width / 2,
-                child: Image.memory(createCtrl.imageBytes.value),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 160,),
+                    Expanded(
+                      // height: 400,
+                      // width: width / 2,
+                      child: Image.memory(createCtrl.imageBytes.value),
+                    ),
+                  ],
+                ),
               ),
-
             const SizedBox(height: 20,),
+            // Content html editing / selection field
             Padding(
               padding: const EdgeInsets.only(top:8.0, right: 8.0, bottom: 8.0),
               child: Row(
                 children: <Widget>[
                   const SizedBox(
-                    width: 200,
+                    width: 160,
                     child: Text(
                       'Article content',
                       style: TextStyle(
@@ -448,6 +478,7 @@ class CreateArticlePage extends GetView<CreateController> {
               ),
             ),
             const SizedBox(height: 20,),
+            // Html text field :: editable
             Container(
               height: 600,
               width: double.infinity,
@@ -472,7 +503,6 @@ class CreateArticlePage extends GetView<CreateController> {
                 style: const TextStyle(color: ColorApp.grey_font),
               ),
             ),
-
             const SizedBox(height: 20,),
           ],
         ),
