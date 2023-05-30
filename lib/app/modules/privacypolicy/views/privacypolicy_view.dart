@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:html/parser.dart';
-import '../../../../constant/strings.dart';
+
 import '../controllers/privacypolicy_controller.dart';
 
 class PrivacyPolicyView extends GetView<PrivacyPolicyController> {

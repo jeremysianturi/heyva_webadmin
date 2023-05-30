@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:html/parser.dart';
+
 import '../controllers/termsofservice_controller.dart';
 
 class TermsOfServiceView extends GetView<TermsOfServiceController> {
