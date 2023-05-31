@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../controllers/menu_controller.dart';
 import '../controllers/navigation_controllers.dart';
+import '../services/admin_client.dart';
 
 
 class AdminLayout extends StatelessWidget {
   // final Widget child;
   // const AdminLayout({super.key, required this.child});
-  const AdminLayout({super.key});
+  AdminLayout({super.key});
+  // final createCtrl = Get.put(CreateController(), permanent: true);
+  final instance = Get.lazyPut(() => CreateController());
 
   @override
   Widget build(BuildContext context) {

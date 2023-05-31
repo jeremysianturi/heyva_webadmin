@@ -202,7 +202,7 @@ class LoginView extends GetView<LoginController> {
                               loginController.postLogin();
                               loginController.emailC.clear();
                               loginController.passC.clear();
-                              Get.off(const AdminLayout());
+                              Get.off(AdminLayout());
                             }
                           },
                         )

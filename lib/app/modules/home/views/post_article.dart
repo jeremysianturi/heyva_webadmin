@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:heyva_web_admin/app/modules/home/controllers/menu_controller.dart';
 import 'package:heyva_web_admin/app/modules/home/model/create_article_data.dart';
 import 'package:heyva_web_admin/constant/colors.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 import '../../login/controllers/login_controller.dart';
 import '../services/admin_client.dart';
 import 'admin_common.dart';
@@ -17,7 +18,9 @@ class TagList {
 
 class CreateArticlePage extends GetView<CreateController> {
   CreateArticlePage({Key? key}) : super(key: key);
-  final createCtrl = Get.put(CreateController(), permanent: true);
+  // final createCtrl = Get.put(CreateController(), permanent: true);
+  static CreateController createCtrl = Get.find<CreateController>();
+  // final _formKey = GlobalKey<FormFieldState>();
   final _formKey = GlobalKey<FormState>();
 
   String attachmentId = '';
@@ -28,10 +31,18 @@ class CreateArticlePage extends GetView<CreateController> {
   var tagList = <TagList> [];
   var selectedTags =  <TagList> [];
 
+  void initTags() async {
+    tagIdNames = await createCtrl.initArticleTagsList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     String pageName = sideMenuItems[SideMenuItems.newArticle.index];
+    if(createCtrl.tagIdNames.isEmpty) {
+      initTags();
+      debugPrint('TEST');
+    }
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -53,6 +64,9 @@ class CreateArticlePage extends GetView<CreateController> {
                     //  - article Category :: tags
                     //  - date <> it may use system date time rather than selecting date from calendar
                     //  - article content [html]
+                    final _items = tagIdNames
+                        ?.map((tag) => MultiSelectItem<TagIdName>(tag, tag.name))
+                        .toList();
                     if(attachmentId.isNotEmpty) {
                       articleId = await createCtrl.postCreateArticle(attachmentId);
                       if(articleId.isNotEmpty) {
