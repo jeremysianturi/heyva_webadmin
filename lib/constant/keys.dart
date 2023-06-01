@@ -9,4 +9,11 @@ class Keys {
   /// Terms of service
   static const String termsOfServiceText = "TERMS_OF_SERVICE_TEXT";
   static const String privacyPolicyText = "PRIVACY_POLICY_TEXT";
+
+
+  ///profile
+  static const String profileName = "PROFILE_NAME";
+  static const String profileImgUrl = "PROFILE_IMG_URL";
+  static const String profilePhone = "PROFILE_PHONE";
+  static const String profileEmail = "PROFILE_EMAIL";
 }

@@ -147,4 +147,11 @@ class Strings {
   static const String change_password = "Change Password";
   static const String your_new_password = "Your new password";
   static const String confirm_your_password = "Confirm your password";
+
+  static const String deletedAccount = "Delete Account";
+
+  static const String deleteAccountTitl = "Are you sure you want to delete your account?";
+  static const String deleteAccountSub = "Your daily tracker, exercise progress, personal data and others will be erased if you proceed to continue.";
+  static const String cancel = "Cancel";
+
 }

@@ -70,8 +70,11 @@ class LoginController extends GetxController {
         box.write(Keys.loginRefreshToken,
             loginResonse.value.data?.refreshToken ?? "");
         box.write(Keys.loginID, loginResonse.value.data?.id ?? "");
+        authToken = "Bearer ${loginResonse.value.data!.accessToken}";
+        refreshToken = loginResonse.value.data?.refreshToken ?? "";
+        userId = loginResonse.value.data?.id ?? "";
         Future.delayed(800.milliseconds);
-        Get.toNamed(Routes.PRIVACY_POLICY);
+        Get.toNamed(Routes.DELETE_ACCOUNT);
       } else {
         if (loginResonse.value.message
             .toString()
