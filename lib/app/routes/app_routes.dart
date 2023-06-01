@@ -11,6 +11,7 @@ abstract class Routes {
   static const RESET_PASSWORD = _Paths.RESET_PASSWORD;
   static const SPLASH_SCREEN = _Paths.SPLASH_SCREEN;
   static const FORGOT_PASSWORD = _Paths.FORGOT_PASSWORD;
+  static const DELETE_ACCOUNT = _Paths.DELETE_ACCOUNT;
 }
 
 abstract class _Paths {
@@ -24,4 +25,5 @@ abstract class _Paths {
   static const RESET_PASSWORD = '/resetpassword/:userid/:request_reset_password_token';
   static const SPLASH_SCREEN = '/splash-screen';
   static const FORGOT_PASSWORD = '/forgotpassword';
+  static const DELETE_ACCOUNT = '/deleteaccount';
 }

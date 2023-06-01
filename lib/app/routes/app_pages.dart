@@ -1,6 +1,8 @@
 import 'package:get/get_navigation/src/routes/get_route.dart';
 import 'package:heyva_web_admin/app/modules/forgotpassword/bindings/forgotpass_binding.dart';
 import 'package:heyva_web_admin/app/modules/forgotpassword/views/forgotpass_view.dart';
+import 'package:heyva_web_admin/app/modules/profile/deleteprofile/bindings/delete_profile_binding.dart';
+import 'package:heyva_web_admin/app/modules/profile/deleteprofile/views/delete_profile_view.dart';
 import 'package:heyva_web_admin/app/modules/splaschscreen/bindings/splash_screen_binding.dart';
 import 'package:heyva_web_admin/app/modules/splaschscreen/views/splash_screen_view.dart';
 
@@ -51,6 +53,11 @@ class AppPages {
       name: _Paths.FORGOT_PASSWORD,
       page: () => ForgotPasswordView(),
       binding: ForgotPasswordBinding(),
+    ),
+    GetPage(
+      name: _Paths.DELETE_ACCOUNT,
+      page: () => DeleteProfileView(),
+      binding: DeleteProfileBinding(),
     ),
   ];
 }
