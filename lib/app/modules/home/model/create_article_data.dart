@@ -97,12 +97,6 @@ class PostArticleData {
   }
 }
 
-Map<String, String> tagsList = {
-  'new born': '8f69d168-1f3c-4543-8bea-9ad6d809b15c',
-  'giving birth': '89b2aae1-7981-48da-ae9f-7116f1b5e007',
-  'getting pregnant': 'a4687ded-9cab-445b-86e3-6cf3e52ee2ce',
-};
-
 // RESPONSE: tags list query by type
 // class TagsArticleModel {
 //   TagsArticleModel({

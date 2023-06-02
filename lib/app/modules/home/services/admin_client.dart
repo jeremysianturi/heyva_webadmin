@@ -8,6 +8,7 @@ import 'package:get/get.dart' as milliseconds;
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:image_picker_web/image_picker_web.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 import '../../../../constant/variables.dart';
 import '../../../../services/dio_services.dart';
 import '../../login/controllers/login_controller.dart';
@@ -78,7 +79,7 @@ class CreateProvider {
     required String artId,
     required String title,
     required String body,
-    required String tag,
+    required List<String> tagsId
   }) async {
     PostArticleModel? resp;
 
@@ -86,10 +87,12 @@ class CreateProvider {
       FormData formData = FormData.fromMap({
         "title": title,
         "body": body,
-        "tag": tagsList[tag],
         "attachment": artId,
         "creator": "Heyva",
       });
+      for(int i=0 ; i < tagsId.length ; i++) {
+        formData.fields.add(MapEntry("tag", tagsId[i]));
+      }
       Response response = await _createClient.post("/api/v1/article/create", data: formData);
       resp = PostArticleModel.fromJson(response.data);
 
@@ -111,7 +114,6 @@ class CreateProvider {
       FormData formData = FormData.fromMap({
       });
       Response response = await _createClient.get(
-        // "/api/v1/dictionary/get-by-type?type=INTERESTS_TAG&search="
         "/api/v1/dictionary/get-by-type?",
         queryParameters: {'type': 'INTERESTS_TAG', 'search': ''}
       );
@@ -144,7 +146,6 @@ class CreateController extends GetxController {
   final accessCtrl = Get.find<LoginController>();
   final TextEditingController titleCtrl = TextEditingController();
   final TextEditingController dateCtrl = TextEditingController();
-  final TextEditingController categoryCtrl = TextEditingController();
   final TextEditingController htmlCtrl = TextEditingController();
 
   var isPostingImage = false;
@@ -164,12 +165,12 @@ class CreateController extends GetxController {
   String htmlFileName = '';
   var imageBytes = Uint8List(0).obs;
   var htmlBytes = Uint8List(0).obs;
-  List<String> tagsList = [];
   List<TagsData>? fullTags = [];
-  late List<dynamic> articleTags;
-  late List<String?> tagsId;
-  late List<String?> tagNames;
   List<TagIdName> tagIdNames = [];
+  var selectedTags = <TagIdName?>[].obs;
+  var items = <MultiSelectItem<TagIdName>>[].obs;
+  List<String> selectedTagsId = [];
+
 
   var getIdResponse =
       AttArticleModel(success: "", data: null, message: "", error: "").obs;
@@ -234,7 +235,7 @@ class CreateController extends GetxController {
             artId: id,
             title: titleCtrl.value.text,
             body: htmlCtrl.value.text,
-            tag: "new born",
+            tagsId: selectedTagsId
           ))!;
           isPostingArticle = false;
           articleId.value = postArticleResponse.value.data!.id!;
@@ -270,9 +271,9 @@ class CreateController extends GetxController {
       getTagsResponse.value = (await _create.getArticleTags())!;
       isGettingTags = false;
       fullTags = getTagsResponse.value.data?.toList();
-      tagsId = fullTags!.map((e) => e.id).toList();
-      tagNames = fullTags!.map((e) => e.name).toList();
       tagIdNames = fullTags!.map((e) => (TagIdName(id: e.id!, name: e.name!))).toList();
+      items.value = tagIdNames!.map((tag) => MultiSelectItem<TagIdName>(tag, tag.name)).toList();
+
       return tagIdNames;
     } catch (err) {
       isGettingTags = false;
@@ -333,7 +334,7 @@ class CreateController extends GetxController {
       attachmentId.value.isNotEmpty &&
       titleCtrl.value.text.isNotEmpty &&
       dateCtrl.value.text.isNotEmpty &&
-      categoryCtrl.value.text.isNotEmpty &&
+      selectedTagsId.isNotEmpty &&
       htmlCtrl.value.text.isNotEmpty
     );
   }
@@ -347,13 +348,18 @@ class CreateController extends GetxController {
       isSelectedImage = false;
       gotAttachmentId.value = false;
       titleCtrl.clear();
-      categoryCtrl.clear();
       dateCtrl.clear();
       htmlCtrl.clear();
       imageBytes.value = Uint8List(0);
       htmlBytes.value = Uint8List(0);
+      selectedTags.value.removeRange(0, selectedTagsId.length);
+      selectedTagsId.clear();
     } else {
       debugPrint('Posting article is not done yet !');
     }
+  }
+
+  updateSelectedTagsId() {
+    selectedTagsId = selectedTags.value.map((e) => e!.id).toList();
   }
 }

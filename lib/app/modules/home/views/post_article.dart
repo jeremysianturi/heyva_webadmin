@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:heyva_web_admin/app/modules/home/controllers/menu_controller.dart';
 import 'package:heyva_web_admin/app/modules/home/model/create_article_data.dart';
 import 'package:heyva_web_admin/constant/colors.dart';
-import 'package:multi_select_flutter/util/multi_select_item.dart';
-import '../../login/controllers/login_controller.dart';
+import 'package:multi_select_flutter/bottom_sheet/multi_select_bottom_sheet_field.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import '../services/admin_client.dart';
 import 'admin_common.dart';
 
@@ -18,18 +18,16 @@ class TagList {
 
 class CreateArticlePage extends GetView<CreateController> {
   CreateArticlePage({Key? key}) : super(key: key);
-  // final createCtrl = Get.put(CreateController(), permanent: true);
   static CreateController createCtrl = Get.find<CreateController>();
-  // final _formKey = GlobalKey<FormFieldState>();
-  final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormFieldState>();
+  final _multiSelectKey = GlobalKey<FormFieldState>();
 
   String attachmentId = '';
   String articleId = '';
   late List<String?> tagNames;
   late List<TagIdName>? tagIdNames;
   late List<String?> selectedNames;
-  var tagList = <TagList> [];
-  var selectedTags =  <TagList> [];
+  // var tagList = <TagList> [];
 
   void initTags() async {
     tagIdNames = await createCtrl.initArticleTagsList();
@@ -39,10 +37,12 @@ class CreateArticlePage extends GetView<CreateController> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     String pageName = sideMenuItems[SideMenuItems.newArticle.index];
+
     if(createCtrl.tagIdNames.isEmpty) {
       initTags();
       debugPrint('TEST');
     }
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -64,10 +64,7 @@ class CreateArticlePage extends GetView<CreateController> {
                     //  - article Category :: tags
                     //  - date <> it may use system date time rather than selecting date from calendar
                     //  - article content [html]
-                    final _items = tagIdNames
-                        ?.map((tag) => MultiSelectItem<TagIdName>(tag, tag.name))
-                        .toList();
-                    if(attachmentId.isNotEmpty) {
+                    if(attachmentId.isNotEmpty && createCtrl.selectedTags.value.isNotEmpty) {
                       articleId = await createCtrl.postCreateArticle(attachmentId);
                       if(articleId.isNotEmpty) {
                         createCtrl.clearCreatePage();
@@ -145,6 +142,77 @@ class CreateArticlePage extends GetView<CreateController> {
               ],
             ),
             // Article interest tags
+            // Row(
+            //   children: <Widget>[
+            //     const SizedBox(
+            //       width: 160,
+            //       child: Text(
+            //         'Article Tags',
+            //         style: TextStyle(
+            //           fontSize: 16,
+            //           fontWeight: FontWeight.normal,
+            //         ),
+            //       ),
+            //     ),
+            //     const SizedBox(width: 10),
+            //     // this is just test requesting Interest Tags list
+            //     // once confirmed this will be used for Multi_Select Chip
+            //     ElevatedButton(
+            //       onPressed: () async {
+            //         tagIdNames = await createCtrl.initArticleTagsList();
+            //         for (var e in tagIdNames!) {
+            //           debugPrint('id: ${e.id.toString()}\nname: ${e.name.toString()}');
+            //         }
+            //       },
+            //       style: ButtonStyle(
+            //         padding: MaterialStateProperty.all(
+            //             const EdgeInsets.symmetric(
+            //                 horizontal: 10.0,
+            //                 vertical: 10.0)
+            //         ),
+            //         textStyle: MaterialStateProperty.all(
+            //           const TextStyle(fontSize: 16),
+            //         ),
+            //         backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
+            //         shape: MaterialStateProperty.all(
+            //           RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(10),
+            //           ),
+            //         ),
+            //       ),
+            //       child: const Row(
+            //         children: <Widget>[
+            //           Icon(Icons.app_registration),
+            //           SizedBox(width: 5),
+            //           Text('Tags List')
+            //         ],
+            //       ),
+            //     ),
+            //     Expanded(
+            //       child: Padding(
+            //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            //         child: TextField(
+            //           onChanged: (text) {
+            //           },
+            //           controller: createCtrl.categoryCtrl,
+            //           decoration: const InputDecoration(
+            //             border: OutlineInputBorder(
+            //               borderSide: BorderSide.none,
+            //               borderRadius: BorderRadius.all(Radius.circular(10)),
+            //             ),
+            //             hintText: 'Select relevant tags',
+            //             fillColor: CupertinoColors.secondarySystemFill,
+            //             filled: true,
+            //             hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
+            //           ),
+            //           cursorColor: ColorApp.grey_font,
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            const SizedBox(height: 20,),
+            // Multi-select chips for interest article tags selection
             Row(
               children: <Widget>[
                 const SizedBox(
@@ -157,65 +225,50 @@ class CreateArticlePage extends GetView<CreateController> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
-                // this is just test requesting Interest Tags list
-                // once confirmed this will be used for Multi_Select Chip
-                ElevatedButton(
-                  onPressed: () async {
-                    tagIdNames = await createCtrl.initArticleTagsList();
-                    for (var e in tagIdNames!) {
-                      debugPrint('id: ${e.id.toString()}\nname: ${e.name.toString()}');
-                    }
-                  },
-                  style: ButtonStyle(
-                    padding: MaterialStateProperty.all(
-                        const EdgeInsets.symmetric(
-                            horizontal: 10.0,
-                            vertical: 10.0)
-                    ),
-                    textStyle: MaterialStateProperty.all(
-                      const TextStyle(fontSize: 16),
-                    ),
-                    backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                  child: const Row(
-                    children: <Widget>[
-                      Icon(Icons.app_registration),
-                      SizedBox(width: 5),
-                      Text('Tags List')
-                    ],
-                  ),
-                ),
+                const SizedBox(width: 10,),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    child: TextField(
-                      onChanged: (text) {
-                      },
-                      controller: createCtrl.categoryCtrl,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                        ),
-                        hintText: 'Select relevant tags',
-                        fillColor: CupertinoColors.secondarySystemFill,
-                        filled: true,
-                        hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
+                  child: MultiSelectBottomSheetField<TagIdName?>(
+                    key: _multiSelectKey,
+                    initialChildSize: 0.7,
+                    maxChildSize: 0.95,
+                    title: const Text("Interest Tags", style: TextStyle(color: ColorApp.grey_font),),
+                    buttonText: const Text("Selected Tags", style: TextStyle(color: ColorApp.grey_font),),
+                    items: createCtrl.items.value,
+                    searchable: true,
+                    selectedColor: ColorApp.btn_pink,
+                    // selectedItemsTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: ColorApp.white),
+                    selectedItemsTextStyle: const TextStyle(color: ColorApp.btn_pink),
+                    validator: (values) {
+                      if (values == null || values.isEmpty) {
+                        return "Required";
+                      }
+                      // return null;
+                    },
+                    onConfirm: (values) {
+                      createCtrl.selectedTags.value = values;
+                      _multiSelectKey.currentState!.validate();
+                      createCtrl.updateSelectedTagsId();
+                    },
+                    chipDisplay: MultiSelectChipDisplay(
+                      // items: createCtrl.selectedTags.value.map((item) => MultiSelectItem<TagIdName>(item!, item.name)).toList(),
+                      chipColor: ColorApp.btn_pink,
+                      textStyle: const TextStyle(color: ColorApp.white_font),
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(2)),
                       ),
-                      cursorColor: ColorApp.grey_font,
+                      onTap: (item) {
+                        createCtrl.selectedTags.value.remove(item);
+                        _multiSelectKey.currentState!.validate();
+                        createCtrl.updateSelectedTagsId();
+                      },
                     ),
                   ),
                 ),
+                const SizedBox(width: 10,),
               ],
             ),
 
-            // Multi-select chips for tags selection
+            const SizedBox(height: 20,),
 
             // Date creation
             Row(
