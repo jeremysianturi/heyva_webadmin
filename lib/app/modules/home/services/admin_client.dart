@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:js_interop';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
@@ -62,7 +60,6 @@ class CreateProvider {
       });
       Response response = await _createClient.post("/api/v1/article-attachment/create", data: formData);
       resp = AttArticleModel.fromJson(response.data);
-      // debugPrint('Article id: ${resp.data?.id}');
 
     } on DioError catch (err) {
       debugPrint('POST fail with result: ${err.response?.statusCode}');
@@ -148,7 +145,6 @@ class CreateController extends GetxController {
   final TextEditingController dateCtrl = TextEditingController();
   final TextEditingController htmlCtrl = TextEditingController();
 
-  var isPostingImage = false;
   var isPostingArticle = false;
   var isGettingTags = false;
   bool isSelectedImage = false;
@@ -158,6 +154,7 @@ class CreateController extends GetxController {
   var gotTagsList = false.obs;
   var attachmentId = ''.obs;
   var articleId = ''.obs;
+  var isPostingReady = false.obs;
   late String artTitle;
   late String artTopic;
   late DateTime postDate;
@@ -179,40 +176,36 @@ class CreateController extends GetxController {
 
     if(isSelectedImage) {
       errorPostMessage.value = '';
-      isPostingImage = true;
         try {
           getIdResponse.value = (await _create.postNewAttachment(bytes: imageBytes.value, fileName: imageFileName))!;
-          isPostingImage = false;
           if(getIdResponse.value.success == 'Success') {
             attachmentId.value = getIdResponse.value.data!.id!;
             if(attachmentId.isNotEmpty) {
               gotAttachmentId.value = true;
+              updateReadiness();
             }
           } else {
             // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
             if(getIdResponse.value.message == 'Expired Signature') {
               accessCtrl.tokenRefresh();
               _client.refreshOption();
-              isPostingImage = true;
               try {
                 getIdResponse.value = (await _create.postNewAttachment(bytes: imageBytes.value, fileName: imageFileName))!;
-                isPostingImage = false;
                 if(getIdResponse.value.success == 'Success') {
                   attachmentId.value = getIdResponse.value.data!.id!;
                   if (attachmentId.isNotEmpty) {
                     gotAttachmentId.value = true;
+                    updateReadiness();
                   }
                 } else {
                   debugPrint('Bad access token signature and \nfailed to get attachment id: ${getIdResponse.value.message} !');
                 }
               } catch (err) {
-                isPostingImage = false;
                 debugPrint("error  $err");
               }
             }
           }
         } catch (err) {
-          isPostingImage = false;
           debugPrint("error  $err");
         }
     } else {
@@ -225,35 +218,54 @@ class CreateController extends GetxController {
 
   Future<String> postCreateArticle(String id) async {
 
-    if(isSubmitReady()) {
-      if (id == attachmentId.value) {
-        errorPostMessage.value = '';
-        isPostingArticle = true;
+    if (id == attachmentId.value) {
+      errorPostMessage.value = '';
+      isPostingArticle = true;
 
-        try {
-          postArticleResponse.value = (await _create.postNewArticle(
-            artId: id,
-            title: titleCtrl.value.text,
-            body: htmlCtrl.value.text,
-            tagsId: selectedTagsId
-          ))!;
-          isPostingArticle = false;
-          articleId.value = postArticleResponse.value.data!.id!;
-          if(articleId.isNotEmpty) {
-            gotPostingId.value = true;
-          }
-          return articleId.value;
-        } catch (err) {
-          isPostingImage = false;
-          debugPrint("error  $err");
-          return '';
+      try {
+        postArticleResponse.value = (await _create.postNewArticle(
+          artId: id,
+          title: titleCtrl.value.text,
+          body: htmlCtrl.value.text,
+          tagsId: selectedTagsId
+        ))!;
+        isPostingArticle = false;
+        articleId.value = postArticleResponse.value.data!.id!;
+        if(articleId.isNotEmpty) {
+          gotPostingId.value = true;
+          updateReadiness();
         }
-      } else {
-        debugPrint('Article invalid !');
+        return articleId.value;
+      } catch (err) {
+        isPostingArticle = false;
+        debugPrint("error  $err");
+        // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
+        if(getIdResponse.value.message == 'Expired Signature') {
+          accessCtrl.tokenRefresh();
+          _client.refreshOption();
+          try {
+            postArticleResponse.value = (await _create.postNewArticle(
+                artId: id,
+                title: titleCtrl.value.text,
+                body: htmlCtrl.value.text,
+                tagsId: selectedTagsId
+            ))!;
+            isPostingArticle = false;
+            articleId.value = postArticleResponse.value.data!.id!;
+            if(articleId.isNotEmpty) {
+              gotPostingId.value = true;
+              updateReadiness();
+            }
+            return articleId.value;
+          } catch (err) {
+            isPostingArticle = false;
+            debugPrint("error  $err");
+          }
+        }
         return '';
       }
     } else {
-      debugPrint('Article not ready to submit yet !');
+      debugPrint('Article invalid !');
       return '';
     }
   }
@@ -265,7 +277,6 @@ class CreateController extends GetxController {
 
     errorPostMessage.value = '';
     isGettingTags = true;
-    debugPrint('Test getting article tags list !');
 
     try {
       getTagsResponse.value = (await _create.getArticleTags())!;
@@ -273,11 +284,30 @@ class CreateController extends GetxController {
       fullTags = getTagsResponse.value.data?.toList();
       tagIdNames = fullTags!.map((e) => (TagIdName(id: e.id!, name: e.name!))).toList();
       items.value = tagIdNames!.map((tag) => MultiSelectItem<TagIdName>(tag, tag.name)).toList();
-
+      gotTagsList.value = true;
+      updateReadiness();
       return tagIdNames;
     } catch (err) {
       isGettingTags = false;
       debugPrint("error  $err");
+      // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
+      if(getIdResponse.value.message == 'Expired Signature') {
+        accessCtrl.tokenRefresh();
+        _client.refreshOption();
+        try {
+          getTagsResponse.value = (await _create.getArticleTags())!;
+          isGettingTags = false;
+          fullTags = getTagsResponse.value.data?.toList();
+          tagIdNames = fullTags!.map((e) => (TagIdName(id: e.id!, name: e.name!))).toList();
+          items.value = tagIdNames!.map((tag) => MultiSelectItem<TagIdName>(tag, tag.name)).toList();
+          gotTagsList.value = true;
+          updateReadiness();
+          return tagIdNames;
+        } catch (err) {
+          isGettingTags = false;
+          debugPrint("error  $err");
+        }
+      }
       return null;
     }
   }
@@ -291,6 +321,7 @@ class CreateController extends GetxController {
       imageBytes.value = data;
       imageFileName = mediaInfo!.fileName!;
       isSelectedImage = true;
+      updateReadiness();
     }
     return imageFileName;
   }
@@ -321,7 +352,7 @@ class CreateController extends GetxController {
       for(var i=0 ; i < htmlBytes.value.buffer.asByteData().lengthInBytes; i++) {
         htmlCtrl.text = htmlCtrl.text + String.fromCharCode(htmlBytes.value.buffer.asByteData().getUint8(i));
       }
-
+      updateReadiness();
     } else {
       // User canceled the picker
       return '';
@@ -329,14 +360,21 @@ class CreateController extends GetxController {
     return htmlFileName;
   }
 
-  bool isSubmitReady() {
-    return (
+  bool updateReadiness() {
+
+    if(
+      titleCtrl.text.isNotEmpty &&
+      dateCtrl.text.isNotEmpty &&
+      htmlCtrl.text.isNotEmpty &&
       attachmentId.value.isNotEmpty &&
       titleCtrl.value.text.isNotEmpty &&
       dateCtrl.value.text.isNotEmpty &&
       selectedTagsId.isNotEmpty &&
       htmlCtrl.value.text.isNotEmpty
-    );
+    ) {
+      isPostingReady.value = true;
+    }
+    return isPostingReady.value;
   }
 
   clearCreatePage() {
@@ -352,8 +390,11 @@ class CreateController extends GetxController {
       htmlCtrl.clear();
       imageBytes.value = Uint8List(0);
       htmlBytes.value = Uint8List(0);
+      gotTagsList.value = false;
       selectedTags.value.removeRange(0, selectedTagsId.length);
       selectedTagsId.clear();
+      gotPostingId.value = false;
+      isPostingReady.value = false;
     } else {
       debugPrint('Posting article is not done yet !');
     }
@@ -361,5 +402,6 @@ class CreateController extends GetxController {
 
   updateSelectedTagsId() {
     selectedTagsId = selectedTags.value.map((e) => e!.id).toList();
+    updateReadiness();
   }
 }

@@ -2,14 +2,17 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../constant/colors.dart';
+import '../services/admin_client.dart';
 
 
 class SelectDate extends StatelessWidget {
   final TextEditingController controller;
   const SelectDate({super.key, required this.controller});
+  static CreateController createCtrl = Get.find<CreateController>();
 
   // final format = DateFormat("yyyy-MM-dd");
   @override
@@ -17,7 +20,7 @@ class SelectDate extends StatelessWidget {
     final format = DateFormat("yyyy-MM-dd");
     return DateTimeField(
       onChanged: (text) {
-        // debugPrint("Date article: ${controller.text}");
+        createCtrl.updateReadiness();
       },
       controller: controller,
       cursorColor: Colors.black,

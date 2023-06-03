@@ -46,6 +46,8 @@ class CreateArticlePage extends GetView<CreateController> {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
+        // It may need to wait till GET ARTICLE INTEREST TAGS list completed :: gotTagsList is true
+        // isGettingTags: whether getting tags list in progress
         child: Obx(() => Column(
           children: <Widget>[
             // Header admin page title and submit dispatching button
@@ -56,26 +58,16 @@ class CreateArticlePage extends GetView<CreateController> {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(width: 64,),
-                ElevatedButton(
+                createCtrl.isPostingReady.value
+                  ? ElevatedButton(
                   onPressed: () async {
-                    // check if all required information ready
-                    //  - article id :: got when post create attachment and this state reps. photo uploaded already
-                    //  - article Title
-                    //  - article Category :: tags
-                    //  - date <> it may use system date time rather than selecting date from calendar
-                    //  - article content [html]
-                    if(attachmentId.isNotEmpty && createCtrl.selectedTags.value.isNotEmpty) {
-                      articleId = await createCtrl.postCreateArticle(attachmentId);
-                      if(articleId.isNotEmpty) {
-                        createCtrl.clearCreatePage();
-                        articleId = '';
-                        attachmentId = '';
-                        debugPrint('Posting article DONE !');
-                        // Launch a snackbar message
-                      }
-                    } else {
+                    articleId = await createCtrl.postCreateArticle(attachmentId);
+                    if(articleId.isNotEmpty) {
+                      createCtrl.clearCreatePage();
+                      articleId = '';
+                      attachmentId = '';
+                      debugPrint('Posting article DONE !');
                       // Launch a snackbar message
-                      debugPrint('Please request attachment id first !');
                     }
                   },
                   style: ButtonStyle(
@@ -93,6 +85,26 @@ class CreateArticlePage extends GetView<CreateController> {
                   child: const Row(
                     children: <Widget>[
                       Text('Submit')
+                    ],
+                  ),
+                )
+                  : ElevatedButton(
+                  onPressed: () {},
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0)),
+                    textStyle: MaterialStateProperty.all(
+                      const TextStyle(fontSize: 16),
+                    ),
+                    backgroundColor: MaterialStateProperty.all(ColorApp.btn_grey),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  child: const Row(
+                    children: <Widget>[
+                      Text('Compose')
                     ],
                   ),
                 ),
@@ -123,6 +135,7 @@ class CreateArticlePage extends GetView<CreateController> {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                     child: TextField(
                       onChanged: (text) {
+                        createCtrl.updateReadiness();
                       },
                       controller: createCtrl.titleCtrl,
                       decoration: const InputDecoration(
@@ -141,76 +154,6 @@ class CreateArticlePage extends GetView<CreateController> {
                 ),
               ],
             ),
-            // Article interest tags
-            // Row(
-            //   children: <Widget>[
-            //     const SizedBox(
-            //       width: 160,
-            //       child: Text(
-            //         'Article Tags',
-            //         style: TextStyle(
-            //           fontSize: 16,
-            //           fontWeight: FontWeight.normal,
-            //         ),
-            //       ),
-            //     ),
-            //     const SizedBox(width: 10),
-            //     // this is just test requesting Interest Tags list
-            //     // once confirmed this will be used for Multi_Select Chip
-            //     ElevatedButton(
-            //       onPressed: () async {
-            //         tagIdNames = await createCtrl.initArticleTagsList();
-            //         for (var e in tagIdNames!) {
-            //           debugPrint('id: ${e.id.toString()}\nname: ${e.name.toString()}');
-            //         }
-            //       },
-            //       style: ButtonStyle(
-            //         padding: MaterialStateProperty.all(
-            //             const EdgeInsets.symmetric(
-            //                 horizontal: 10.0,
-            //                 vertical: 10.0)
-            //         ),
-            //         textStyle: MaterialStateProperty.all(
-            //           const TextStyle(fontSize: 16),
-            //         ),
-            //         backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
-            //         shape: MaterialStateProperty.all(
-            //           RoundedRectangleBorder(
-            //             borderRadius: BorderRadius.circular(10),
-            //           ),
-            //         ),
-            //       ),
-            //       child: const Row(
-            //         children: <Widget>[
-            //           Icon(Icons.app_registration),
-            //           SizedBox(width: 5),
-            //           Text('Tags List')
-            //         ],
-            //       ),
-            //     ),
-            //     Expanded(
-            //       child: Padding(
-            //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            //         child: TextField(
-            //           onChanged: (text) {
-            //           },
-            //           controller: createCtrl.categoryCtrl,
-            //           decoration: const InputDecoration(
-            //             border: OutlineInputBorder(
-            //               borderSide: BorderSide.none,
-            //               borderRadius: BorderRadius.all(Radius.circular(10)),
-            //             ),
-            //             hintText: 'Select relevant tags',
-            //             fillColor: CupertinoColors.secondarySystemFill,
-            //             filled: true,
-            //             hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
-            //           ),
-            //           cursorColor: ColorApp.grey_font,
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
             const SizedBox(height: 20,),
             // Multi-select chips for interest article tags selection
             Row(
@@ -553,6 +496,7 @@ class CreateArticlePage extends GetView<CreateController> {
               // color: ColorApp.grey_divider,
               child: TextField(
                 onTap: () {
+                  createCtrl.updateReadiness();
                 },
                 controller: createCtrl.htmlCtrl,
                 decoration: const InputDecoration(
