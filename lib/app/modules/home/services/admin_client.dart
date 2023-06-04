@@ -55,8 +55,8 @@ class CreateProvider {
 
     try {
       FormData formData = FormData.fromMap({
-        "attachment":
-        MultipartFile.fromBytes(bytes, filename: fileName),
+        "attachment": MultipartFile.fromBytes(bytes, filename: fileName),
+        "app_env": "development",
       });
       Response response = await _createClient.post("/api/v1/article-attachment/create", data: formData);
       resp = AttArticleModel.fromJson(response.data);
@@ -90,6 +90,7 @@ class CreateProvider {
       for(int i=0 ; i < tagsId.length ; i++) {
         formData.fields.add(MapEntry("tag", tagsId[i]));
       }
+      formData.fields.add(const MapEntry("app_env", "development"));
       Response response = await _createClient.post("/api/v1/article/create", data: formData);
       resp = PostArticleModel.fromJson(response.data);
 

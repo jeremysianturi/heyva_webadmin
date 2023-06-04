@@ -196,13 +196,15 @@ class LoginView extends GetView<LoginController> {
                         ),
                         OrangeButtonWTrailingIcon(
                           text: Strings.login,
-                          onTap: () {
+                          onTap: () async {
                             FocusScope.of(context).requestFocus(FocusNode());
                             if (loginController.validateData) {
-                              loginController.postLogin();
-                              loginController.emailC.clear();
-                              loginController.passC.clear();
-                              Get.off(AdminLayout());
+                              bool isLogged = await loginController.postLogin();
+                              if(isLogged) {
+                                loginController.emailC.clear();
+                                loginController.passC.clear();
+                                Get.off(AdminLayout());
+                              }
                             }
                           },
                         )

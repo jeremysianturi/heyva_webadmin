@@ -57,7 +57,7 @@ class LoginController extends GetxController {
   var loginResponse =
       LoginModel(success: "", data: null, message: "", error: "").obs;
 
-  postLogin() async {
+  Future<bool> postLogin() async {
     errorMessage.value = "";
     isLoading.value = true;
     try {
@@ -79,6 +79,7 @@ class LoginController extends GetxController {
         // emailC.clear();
         // passC.clear();
         // Get.off(const AdminLayout());
+        return true;
       } else {
         if (loginResponse.value.message
             .toString()
@@ -96,6 +97,7 @@ class LoginController extends GetxController {
 
       debugPrint("error  $e");
     }
+    return false;
   }
 
   var response =
