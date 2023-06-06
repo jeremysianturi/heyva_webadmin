@@ -50,13 +50,13 @@ class CreateProvider {
   final Dio _createClient;
   CreateProvider(this._createClient);
 
-  Future<AttArticleModel?> postNewAttachment({required Uint8List bytes, required String fileName}) async {
+  Future<AttArticleModel?> postNewAttachment({required Uint8List bytes, required String fileName, required String mode}) async {
     AttArticleModel? resp;
 
     try {
       FormData formData = FormData.fromMap({
         "attachment": MultipartFile.fromBytes(bytes, filename: fileName),
-        "app_env": "development",
+        "app_env": mode,
       });
       Response response = await _createClient.post("/api/v1/article-attachment/create", data: formData);
       resp = AttArticleModel.fromJson(response.data);
@@ -76,7 +76,8 @@ class CreateProvider {
     required String artId,
     required String title,
     required String body,
-    required List<String> tagsId
+    required List<String> tagsId,
+    required String mode,
   }) async {
     PostArticleModel? resp;
 
@@ -90,7 +91,7 @@ class CreateProvider {
       for(int i=0 ; i < tagsId.length ; i++) {
         formData.fields.add(MapEntry("tag", tagsId[i]));
       }
-      formData.fields.add(const MapEntry("app_env", "development"));
+      formData.fields.add(MapEntry("app_env", mode));
       Response response = await _createClient.post("/api/v1/article/create", data: formData);
       resp = PostArticleModel.fromJson(response.data);
 
@@ -116,7 +117,6 @@ class CreateProvider {
         queryParameters: {'type': 'INTERESTS_TAG', 'search': ''}
       );
       resp = TagsArticleModel.fromJson(response.data);
-      debugPrint('Get Tags: ${resp.success}');
 
     } on DioError catch (err) {
       debugPrint('POST fail with result: ${err.response?.statusCode}');
@@ -168,6 +168,7 @@ class CreateController extends GetxController {
   var selectedTags = <TagIdName?>[].obs;
   var items = <MultiSelectItem<TagIdName>>[].obs;
   List<String> selectedTagsId = [];
+  var selectedMode = ''.obs;
 
 
   var getIdResponse =
@@ -178,7 +179,11 @@ class CreateController extends GetxController {
     if(isSelectedImage) {
       errorPostMessage.value = '';
         try {
-          getIdResponse.value = (await _create.postNewAttachment(bytes: imageBytes.value, fileName: imageFileName))!;
+          getIdResponse.value = (await _create.postNewAttachment(
+            bytes: imageBytes.value,
+            fileName: imageFileName,
+            mode: selectedMode.value.toLowerCase()
+          ))!;
           if(getIdResponse.value.success == 'Success') {
             attachmentId.value = getIdResponse.value.data!.id!;
             if(attachmentId.isNotEmpty) {
@@ -191,7 +196,11 @@ class CreateController extends GetxController {
               accessCtrl.tokenRefresh();
               _client.refreshOption();
               try {
-                getIdResponse.value = (await _create.postNewAttachment(bytes: imageBytes.value, fileName: imageFileName))!;
+                getIdResponse.value = (await _create.postNewAttachment(
+                  bytes: imageBytes.value,
+                  fileName: imageFileName,
+                  mode: selectedMode.value.toLowerCase()
+                ))!;
                 if(getIdResponse.value.success == 'Success') {
                   attachmentId.value = getIdResponse.value.data!.id!;
                   if (attachmentId.isNotEmpty) {
@@ -228,7 +237,8 @@ class CreateController extends GetxController {
           artId: id,
           title: titleCtrl.value.text,
           body: htmlCtrl.value.text,
-          tagsId: selectedTagsId
+          tagsId: selectedTagsId,
+          mode: selectedMode.value.toLowerCase()
         ))!;
         isPostingArticle = false;
         articleId.value = postArticleResponse.value.data!.id!;
@@ -246,10 +256,11 @@ class CreateController extends GetxController {
           _client.refreshOption();
           try {
             postArticleResponse.value = (await _create.postNewArticle(
-                artId: id,
-                title: titleCtrl.value.text,
-                body: htmlCtrl.value.text,
-                tagsId: selectedTagsId
+              artId: id,
+              title: titleCtrl.value.text,
+              body: htmlCtrl.value.text,
+              tagsId: selectedTagsId,
+              mode: selectedMode.value.toLowerCase()
             ))!;
             isPostingArticle = false;
             articleId.value = postArticleResponse.value.data!.id!;
@@ -380,6 +391,7 @@ class CreateController extends GetxController {
 
   clearCreatePage() {
     if(gotPostingId.value) {
+      selectedMode.value = '';
       imageFileName = '';
       htmlFileName = '';
       attachmentId.value = '';

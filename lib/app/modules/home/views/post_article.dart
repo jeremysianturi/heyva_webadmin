@@ -37,10 +37,10 @@ class CreateArticlePage extends GetView<CreateController> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     String pageName = sideMenuItems[SideMenuItems.newArticle.index];
+    final List<String> selectionMode = ['Development', 'Production'];
 
     if(createCtrl.tagIdNames.isEmpty) {
       initTags();
-      debugPrint('TEST');
     }
 
     return SafeArea(
@@ -109,10 +109,35 @@ class CreateArticlePage extends GetView<CreateController> {
                   ),
                 ),
                 const Spacer(),
+                const SizedBox(width: 100,),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: TitleField(),
+                    // child: TitleField(),
+                    child: SizedBox(
+                      height: 30,
+                      // width: 40,
+                      child: DropdownButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        hint: const Text('Select Job Mode'),
+                        value: createCtrl.selectedMode.value.isEmpty ? null : createCtrl.selectedMode.value,
+                        onChanged: (newValue) {
+                          if(attachmentId.isEmpty) {
+                            createCtrl.selectedMode.value = newValue!;
+                          }
+                        },
+                        style: const TextStyle(fontSize: 14, color: ColorApp.white_font),
+                        focusColor: ColorApp.btn_pink,
+                        dropdownColor: ColorApp.btn_pink,
+                        borderRadius: BorderRadius.circular(10),
+                        items: selectionMode.map((choice) {
+                          return DropdownMenuItem(
+                            value: choice,
+                            child: Text(choice, style: const TextStyle(color: ColorApp.white_font),),
+                          );
+                        }).toList(),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -283,10 +308,12 @@ class CreateArticlePage extends GetView<CreateController> {
                       )
                       : ElevatedButton(
                       onPressed: () async {
-                        await createCtrl.getAttachmentId();
-                        attachmentId = createCtrl.attachmentId.value;
-                        if(attachmentId.isEmpty) {
-                          // Error handler
+                        if(createCtrl.selectedMode.value.isNotEmpty) {
+                          await createCtrl.getAttachmentId();
+                          attachmentId = createCtrl.attachmentId.value;
+                          if (attachmentId.isEmpty) {
+                            // Error handler
+                          }
                         }
                       },
                       style: ButtonStyle(
