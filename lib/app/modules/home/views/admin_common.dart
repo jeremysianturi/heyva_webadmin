@@ -18,30 +18,35 @@ class SelectDate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final format = DateFormat("yyyy-MM-dd");
-    return DateTimeField(
-      onChanged: (text) {
-        createCtrl.updateReadiness();
-      },
-      controller: controller,
-      cursorColor: Colors.black,
-      decoration: const InputDecoration(
-        hintText: "YYY/MM/DD",
-        hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
-        fillColor: CupertinoColors.secondarySystemFill,
-        filled: true,
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
+    return SizedBox(
+      height: 40,
+      child: DateTimeField(
+        onChanged: (text) {
+          createCtrl.updateReadiness();
+        },
+        controller: controller,
+        style: const TextStyle(fontSize: 14),
+        cursorColor: Colors.black,
+        decoration: const InputDecoration(
+          hintText: "YYY/MM/DD",
+          hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
+          contentPadding: EdgeInsets.only(left: 10, top: 20),
+          fillColor: CupertinoColors.secondarySystemFill,
+          filled: true,
+          border: OutlineInputBorder(
+            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+          ),
         ),
+        format: format,
+        onShowPicker: (context, currentValue) {
+          return showDatePicker(
+              context: context,
+              firstDate: DateTime(1900),
+              initialDate: currentValue ?? DateTime.now(),
+              lastDate: DateTime(2100));
+        },
       ),
-      format: format,
-      onShowPicker: (context, currentValue) {
-        return showDatePicker(
-            context: context,
-            firstDate: DateTime(1900),
-            initialDate: currentValue ?? DateTime.now(),
-            lastDate: DateTime(2100));
-      },
     );
   }
 }

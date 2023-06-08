@@ -158,28 +158,32 @@ class CreateArticlePage extends GetView<CreateController> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                    child: TextField(
-                      onChanged: (text) {
-                        createCtrl.updateReadiness();
-                      },
-                      controller: createCtrl.titleCtrl,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                    child: SizedBox(
+                      height: 40,
+                      child: TextField(
+                        onChanged: (text) {
+                          createCtrl.updateReadiness();
+                        },
+                        controller: createCtrl.titleCtrl,
+                        textAlignVertical: TextAlignVertical.bottom,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          hintText: 'Article title',
+                          fillColor: CupertinoColors.secondarySystemFill,
+                          filled: true,
+                          hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
                         ),
-                        hintText: 'Article title',
-                        fillColor: CupertinoColors.secondarySystemFill,
-                        filled: true,
-                        hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
+                        cursorColor: ColorApp.grey_font,
                       ),
-                      cursorColor: ColorApp.grey_font,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 20,),
+            // const SizedBox(height: 20,),
             // Multi-select chips for interest article tags selection
             Row(
               children: <Widget>[
@@ -429,7 +433,7 @@ class CreateArticlePage extends GetView<CreateController> {
                 ],
               ),
             ),
-            const SizedBox(height: 20,),
+            // const SizedBox(height: 20,),
             // Photo widget container
             createCtrl.imageBytes.value.isEmpty ?
               const Text(
