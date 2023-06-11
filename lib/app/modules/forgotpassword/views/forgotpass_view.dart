@@ -38,13 +38,13 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                   Expanded(
                     flex: 1,
                     child: Container(
-                      child: TextButton(
-                        onPressed: () {
-                          // Get.to(TermsOfServiceView());
-                          Get.toNamed(Routes.TERMS_OF_SERVICE);
-                        },
-                        child: const Text("Go to Terms of Service"),
-                      ),
+                      // child: TextButton(
+                      //   onPressed: () {
+                      //     // Get.to(TermsOfServiceView());
+                      //     Get.toNamed(Routes.TERMS_OF_SERVICE);
+                      //   },
+                      //   child: const Text("Go to Terms of Service"),
+                      // ),
                     ),
                   ),
                   Expanded(
@@ -56,7 +56,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              Strings.login,
+                              Strings.forgot_password,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 28,
@@ -193,7 +193,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                           ),
                         ),
                         OrangeButtonWTrailingIcon(
-                          text: Strings.login,
+                          text: Strings.change_password,
                           onTap: () {
                             Get.offAllNamed(Routes.LOGIN);
                             FocusScope.of(context).requestFocus(FocusNode());
@@ -207,22 +207,7 @@ class ForgotPasswordView extends GetView<ForgotPasswordController> {
                   ),
                   Expanded(
                     flex: 1,
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: 55),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            Strings.cant_login,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: ColorApp.black_font_underline,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600),
-                          )
-                        ],
-                      ),
-                    ),
+                    child: Container()
                   ),
                 ],
               ),
