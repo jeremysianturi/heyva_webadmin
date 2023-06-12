@@ -65,8 +65,8 @@ class ResetPasswordController extends GetxController {
       resetPassResponse.value = (await _provider.resetPass(
         confPass: confPassC.text,
         newPass: passC.text,
-        token:
-            "${Get.parameters['userid']}/${Get.parameters['request_reset_password_token']}",
+        userId: "${Get.parameters['userid']}",
+        token: "${Get.parameters['request_reset_password_token']}",
       ))!;
       isLoading.value = false;
 
