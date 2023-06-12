@@ -61,6 +61,13 @@ class LoginView extends GetView<LoginController> {
                             },
                             child: const Text("Go to Forgot Password"),
                           ),
+                          TextButton(
+                            onPressed: () {
+                              // Get.to(ForgotPasswordView());
+                              Get.toNamed(Routes.RESET_PASSWORD);
+                            },
+                            child: const Text("Go to Reset Password"),
+                          ),
                         ],
                       ),
                     ),

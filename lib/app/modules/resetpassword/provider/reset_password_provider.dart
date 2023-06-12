@@ -9,11 +9,11 @@ class ResetPasswordProvider {
   ResetPasswordProvider(this._client);
 
   Future<ResetPasswordModel?> resetPass(
-      {required newPass, required confPass, required token}) async {
+      {required newPass, required confPass,required userId, required token}) async {
     ResetPasswordModel? res;
     try {
       Response response = await _client.put(
-        '/api/v1/users/reset-password/$token',
+        '/api/v1/users/reset-password/$userId/$token',
         data: {"new_password": newPass, "confirm_new_password": confPass},
       );
       debugPrint('response data: ${response.data}');
