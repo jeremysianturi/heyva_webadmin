@@ -6,7 +6,7 @@ import 'package:heyva_web_admin/app/modules/home/model/create_article_data.dart'
 import 'package:heyva_web_admin/constant/colors.dart';
 import 'package:multi_select_flutter/bottom_sheet/multi_select_bottom_sheet_field.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
-import '../services/admin_client.dart';
+import '../services/create_client.dart';
 import 'admin_common.dart';
 
 class TagList {
