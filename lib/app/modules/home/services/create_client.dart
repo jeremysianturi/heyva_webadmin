@@ -252,7 +252,7 @@ class CreateController extends GetxController {
         isPostingArticle = false;
         debugPrint("error  $err");
         // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
-        if(getIdResponse.value.message == 'Expired Signature') {
+        if(postArticleResponse.value.message == 'Expired Signature') {
           accessCtrl.tokenRefresh();
           _client.refreshOption();
           try {
@@ -304,7 +304,7 @@ class CreateController extends GetxController {
       isGettingTags = false;
       debugPrint("error  $err");
       // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
-      if(getIdResponse.value.message == 'Expired Signature') {
+      if(getTagsResponse.value.message == 'Expired Signature') {
         accessCtrl.tokenRefresh();
         _client.refreshOption();
         try {

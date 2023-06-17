@@ -1,24 +1,32 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:heyva_web_admin/constant/colors.dart';
 
 import '../controllers/menu_controller.dart';
+import '../services/create_client.dart';
+import '../services/read_client.dart';
 import 'admin_common.dart';
 
 
 class ViewArticlePage extends StatelessWidget {
   ViewArticlePage({Key? key}) : super(key: key);
+  static ReadController readCtrl = Get.find<ReadController>();
 
   final TextEditingController titleEditingController = TextEditingController();
   final TextEditingController dateEditingController = TextEditingController();
   final TextEditingController categoryEditingController = TextEditingController();
   final TextEditingController htmlEditingController = TextEditingController();
 
+  void initReadArticles() async {
+    await readCtrl.initArticleList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     String pageName = sideMenuItems[SideMenuItems.viewArticle.index];
+    initReadArticles();
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
