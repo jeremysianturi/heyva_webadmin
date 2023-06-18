@@ -60,6 +60,8 @@ class ReadController extends GetxController {
   var isGettingArticles = false;
   var errorPostMessage = ''.obs;
   var gotArticleList = false.obs;
+  int nbrOfArticles = 0;
+  int gotArticles = 0;
   List<GetArticleData>? fullArticlesList = [];
   List<ArticleListTable> articleListTable = [];
 
@@ -70,53 +72,82 @@ class ReadController extends GetxController {
 
     errorPostMessage.value = '';
     isGettingArticles = true;
+    int page = 1;
 
-    try {
-      getArticleListResponse.value = (await _read.getArticleList(1))!;
-      debugPrint('Got ${getArticleListResponse.value.data?.length} articles !');
-      isGettingArticles = false;
-      fullArticlesList = getArticleListResponse.value.data?.toList();
-      // articleListTable = fullArticlesList!.map((e) => (
-      //     ArticleListTable(
-      //     id: e.id,
-      //     title: e.title,
-      //     // tags: e.tags?.map((x) => {x.tags.map((y) => y.name)}).toList() as List<String>,
-      //     htmlBody: e.renderedBody,
-      //     creator: e.creator
-      //   ))).toList();
-      gotArticleList.value = true;
-      // updateReadiness();
-      return fullArticlesList;
-    } catch (err) {
-      isGettingArticles = false;
-      debugPrint("error  $err");
-      // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
-      if(getArticleListResponse.value.message == 'Expired Signature') {
-        accessCtrl.tokenRefresh();
-        _client.refreshOption();
-        debugPrint('Access token just refreshed !');
-        try {
-          getArticleListResponse.value = (await _read.getArticleList(1))!;
-          isGettingArticles = false;
-          fullArticlesList = getArticleListResponse.value.data?.toList();
-          articleListTable = fullArticlesList!.map((e) => (
-              ArticleListTable(
-                  id: e.id!,
-                  title: e.title!,
-                  // tags: e.tags?.map((x) => {x.tag?.map((y) => y.name)}).toList() as List<String>?,
-                  tags: e.tags?.map((x) => {x.tag?.name}).toList() as List<String>?,
-                  htmlBody: e.renderedBody!,
-                  creator: e.creator
-              ))).toList();
+    do {
+      try {
+        getArticleListResponse.value = (await _read.getArticleList(page))!;
+        // fullArticlesList = getArticleListResponse.value.data?.toList();
+        fullArticlesList?.addAll(getArticleListResponse.value.data as Iterable<GetArticleData>);
+        if(gotArticles == 0) {
+          nbrOfArticles = getArticleListResponse.value.count!;
+          gotArticles += getArticleListResponse.value.data!.length;
+        } else {
+          gotArticles += getArticleListResponse.value.data!.length;
+        }
+        // articleListTable = fullArticlesList!.map((e) => (
+        //     ArticleListTable(
+        //     id: e.id,
+        //     title: e.title,
+        //     // tags: e.tags?.map((x) => {x.tags.map((y) => y.name)}).toList() as List<String>,
+        //     htmlBody: e.renderedBody,
+        //     creator: e.creator
+        //   ))).toList();
+      } catch (err) {
+        isGettingArticles = false;
+        debugPrint("error  $err");
+        // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
+        if(getArticleListResponse.value.message == 'Expired Signature') {
+          accessCtrl.tokenRefresh();
+          _client.refreshOption();
+          debugPrint('Access token just refreshed !');
+          try {
+            getArticleListResponse.value = (await _read.getArticleList(page))!;
+            // fullArticlesList = getArticleListResponse.value.data?.toList();
+            fullArticlesList?.addAll(getArticleListResponse.value.data as Iterable<GetArticleData>);
+            if(gotArticles == 0) {
+              nbrOfArticles = getArticleListResponse.value.count!;
+              gotArticles += getArticleListResponse.value.data!.length;
+            } else {
+              gotArticles += getArticleListResponse.value.data!.length;
+            }
+            // articleListTable = fullArticlesList!.map((e) => (
+            //     ArticleListTable(
+            //     id: e.id,
+            //     title: e.title,
+            //     // tags: e.tags?.map((x) => {x.tags.map((y) => y.name)}).toList() as List<String>,
+            //     htmlBody: e.renderedBody,
+            //     creator: e.creator
+            //   ))).toList();
+            gotArticleList.value = true;
+          } catch (err) {
+            isGettingArticles = false;
+            debugPrint("error  $err");
+          }
+        }
+        if(gotArticles > 0) {
           gotArticleList.value = true;
-          // updateReadiness();
           return fullArticlesList;
-        } catch (err) {
-          isGettingArticles = false;
-          debugPrint("error  $err");
+        } else {
+          return null;
         }
       }
-      return null;
-    }
+      debugPrint('Got $gotArticles articles out of total $nbrOfArticles !');
+      page++;
+    } while (nbrOfArticles > gotArticles);
+
+    gotArticleList.value = true;
+    isGettingArticles = false;
+    articleListTable.addAll(fullArticlesList!.map((e) => (
+        ArticleListTable(
+            id: e.id!,
+            title: e.title!,
+            // tags: e.tags?.map((x) => {x.tag?.name}).toList() as List<String>,
+            tags: e.tags?.map((x) => x.tag?.name).toList() as List<String?>,
+            htmlBody: e.renderedBody!,
+            creator: e.creator
+        ))).toList());
+    // updateReadiness();
+    return fullArticlesList;
   }
 }

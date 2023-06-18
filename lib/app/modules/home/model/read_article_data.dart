@@ -163,7 +163,7 @@ class GetTagsData {
 class ArticleListTable {
   String id;
   String title;
-  List<String>? tags;
+  List<String?> tags;
   String htmlBody;
   String? creator;
 

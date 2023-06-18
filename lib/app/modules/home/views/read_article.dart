@@ -26,7 +26,9 @@ class ViewArticlePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     String pageName = sideMenuItems[SideMenuItems.viewArticle.index];
-    initReadArticles();
+    if(!readCtrl.gotArticleList.value) {
+      initReadArticles();
+    }
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
