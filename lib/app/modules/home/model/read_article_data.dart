@@ -163,9 +163,10 @@ class GetTagsData {
 class ArticleListTable {
   String id;
   String title;
-  List<String?> tags;
-  String htmlBody;
   String? creator;
+  // List<String?> tags;
+  String? tags;
+  // String htmlBody;
 
-  ArticleListTable({required this.id, required this.title, required this.tags, required this.htmlBody, this.creator});
+  ArticleListTable({required this.id, required this.title, this.creator, required this.tags/*, required this.htmlBody*/});
 }

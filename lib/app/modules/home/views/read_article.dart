@@ -1,12 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:heyva_web_admin/constant/colors.dart';
 
 import '../controllers/menu_controller.dart';
-import '../services/create_client.dart';
 import '../services/read_client.dart';
-import 'admin_common.dart';
 
 
 class ViewArticlePage extends StatelessWidget {
@@ -32,162 +29,165 @@ class ViewArticlePage extends StatelessWidget {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            Row(
-              children: <Widget>[
-                Text(
-                  pageName,
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const Spacer(),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TitleField(),
+        child: Obx(() => readCtrl.isGettingArticles.value ? Container()
+          : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Text(
+                    pageName,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const Spacer(),
+                  // Expanded(
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.all(8.0),
+                  //     child: TitleField(),
+                  //   ),
+                  // ),
+                ],
+              ),
+              const SizedBox(height: 20,),
+              SizedBox(
+                width: double.infinity,
+                child: Theme(
+                  data: ThemeData.light()
+                      .copyWith(cardColor: Theme.of(context).canvasColor),
+                  child: PaginatedDataTable(
+                    sortColumnIndex: readCtrl.sortColumnIndex.value,
+                    sortAscending: readCtrl.sort.value,
+                    header: Container(
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                          ),
+                          borderRadius: BorderRadius.circular(12)),
+                      child: TextField(
+                        controller: readCtrl.filterCtrl,
+                        decoration: InputDecoration(
+                          hintText: "Enter key word to filter",
+                          border: InputBorder.none,
+                          prefixIcon: const Icon(Icons.search),
+                          prefixIconColor: Colors.grey,
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              readCtrl.clearFilter();
+                            },
+                            icon: const Icon(Icons.clear, color: Colors.grey,),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          readCtrl.filterArticleTable(value);
+                        },
+                      ),
+                    ),
+                    source: ArticleData(
+                      myData: readCtrl.allArticleList.value,
+                      count: readCtrl.allArticleList.value.length,
+                    ),
+                    rowsPerPage: 10,
+                    columnSpacing: 20,
+                    dataRowMaxHeight: 38,
+                    dataRowMinHeight: 28,
+                    columns: getColumns(),
                   ),
                 ),
-              ],
-            ),
-            // Row(
-            //   children: <Widget>[
-            //     const SizedBox(
-            //       width: 200,
-            //       child: Text(
-            //         'Title',
-            //         style: TextStyle(
-            //           fontSize: 16,
-            //           fontWeight: FontWeight.normal,
-            //         ),
-            //       ),
-            //     ),
-            //     Expanded(
-            //       child: Padding(
-            //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            //         child: TextField(
-            //           onChanged: (text) {
-            //             debugPrint("Article title: ${titleEditingController.text}");
-            //           },
-            //           controller: titleEditingController,
-            //           decoration: const InputDecoration(
-            //             border: OutlineInputBorder(
-            //               borderSide: BorderSide.none,
-            //               borderRadius: BorderRadius.all(Radius.circular(10)),
-            //             ),
-            //             hintText: 'Article title',
-            //             fillColor: CupertinoColors.secondarySystemFill,
-            //             filled: true,
-            //             hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
-            //           ),
-            //           cursorColor: ColorApp.grey_font,
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            // Row(
-            //   children: <Widget>[
-            //     const SizedBox(
-            //       width: 200,
-            //       child: Text(
-            //         'Category',
-            //         style: TextStyle(
-            //           fontSize: 16,
-            //           fontWeight: FontWeight.normal,
-            //         ),
-            //       ),
-            //     ),
-            //     Expanded(
-            //       child: Padding(
-            //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            //         child: TextField(
-            //           onChanged: (text) {
-            //             debugPrint("Article category: ${categoryEditingController.text}");
-            //           },
-            //           controller: categoryEditingController,
-            //           decoration: const InputDecoration(
-            //             border: OutlineInputBorder(
-            //               borderSide: BorderSide.none,
-            //               borderRadius: BorderRadius.all(Radius.circular(10)),
-            //             ),
-            //             hintText: 'Article category',
-            //             fillColor: CupertinoColors.secondarySystemFill,
-            //             filled: true,
-            //             hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
-            //           ),
-            //           cursorColor: ColorApp.grey_font,
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            // Row(
-            //   children: <Widget>[
-            //     const SizedBox(
-            //       width: 200,
-            //       child: Text(
-            //         'Date',
-            //         style: TextStyle(
-            //           fontSize: 16,
-            //           fontWeight: FontWeight.normal,
-            //         ),
-            //       ),
-            //     ),
-            //     Expanded(
-            //       child: Padding(
-            //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-            //         child: SelectDate(controller: dateEditingController,),
-            //       ),
-            //     ),
-            //   ],
-            // ),
-            // const SizedBox(height: 20,),
-            // Center(
-            //   child: Container(
-            //     height: 400,
-            //     width: width / 2,
-            //     color: Colors.black,
-            //     child: const Text(
-            //       "\nPhoto",
-            //       textAlign: TextAlign.center,
-            //       style: TextStyle(
-            //         color: Colors.white,
-            //         fontSize: 32,
-            //         fontWeight: FontWeight.bold,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // const SizedBox(height: 20,),
-            // Container(
-            //   height: 600,
-            //   width: double.infinity,
-            //   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            //   // color: ColorApp.grey_divider,
-            //   child: TextField(
-            //     onChanged: (text) {
-            //       debugPrint("Article html: ${htmlEditingController.text}");
-            //     },
-            //     controller: htmlEditingController,
-            //     decoration: const InputDecoration(
-            //       border: OutlineInputBorder(
-            //         borderSide: BorderSide.none,
-            //         borderRadius: BorderRadius.all(Radius.circular(10)),
-            //       ),
-            //       hintText: 'Article content [html]',
-            //       fillColor: CupertinoColors.secondarySystemFill,
-            //       filled: true,
-            //       hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
-            //     ),
-            //     cursorColor: Colors.black,
-            //     maxLines: 1000,
-            //     style: const TextStyle(color: ColorApp.grey_font),
-            //     // expands: true,
-            //   ),
-            // ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
+  List<DataColumn> getColumns() {
+    return [
+      DataColumn(
+          label: const Text(
+            "Title",
+            style: TextStyle(
+                fontWeight: FontWeight.w600, fontSize: 14),
+          ),
+          onSort: (columnIndex, ascending) {
+            readCtrl.sortColumnIndex.value = columnIndex;
+            readCtrl.sort.value = ascending;
+            readCtrl.onSortColumn(columnIndex, ascending);
+          }
+      ),
+      DataColumn(
+        label: const Text(
+          "Creator",
+          style: TextStyle(
+              fontWeight: FontWeight.w600, fontSize: 14),
+        ),
+          onSort: (columnIndex, ascending) {
+            readCtrl.sortColumnIndex.value = columnIndex;
+            readCtrl.sort.value = ascending;
+            readCtrl.onSortColumn(columnIndex, ascending);
+          }
+      ),
+      const DataColumn(
+        label: Text(
+          "Tags",
+          style: TextStyle(
+              fontWeight: FontWeight.w600, fontSize: 14),
+        ),
+      )
+
+    ];
+  }
 }
+
+class ArticleData extends DataTableSource {
+  var myData;
+  final count;
+  ArticleData({
+    required this.myData,
+    required this.count,
+  });
+
+  void viewArticle() {
+    debugPrint('this will invoke a widget to display an article !');
+  }
+
+  @override
+  DataRow? getRow(int index) {
+    if (index < rowCount) {
+      // return recentFileDataRow(myData![index]);
+      return recentFileDataRow(myData![index], index, viewArticle);
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => count;
+
+  @override
+  int get selectedRowCount => 0;
+}
+
+// DataRow recentFileDataRow(var data) {
+DataRow recentFileDataRow(var data, int index, Function onSelectRow) {
+  return DataRow.byIndex(
+    index: index,
+    // selected: data.selected,
+    // onSelectChanged: (value) {
+    //   if(data.selected != value) {
+    //     data.selected = value;
+    //     onSelectRow();
+    //   }
+    // },
+    cells: [
+      DataCell(Text(data.title ?? "Title")),
+      DataCell(Text(data.creator ?? "Literature / News")),
+      DataCell(Text(data.tags)),
+    ],
+  );
+}
+
