@@ -6,6 +6,7 @@ import 'package:heyva_web_admin/app/modules/home/model/create_article_data.dart'
 import 'package:heyva_web_admin/constant/colors.dart';
 import 'package:multi_select_flutter/bottom_sheet/multi_select_bottom_sheet_field.dart';
 import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
 import '../services/create_client.dart';
 import 'admin_common.dart';
 
@@ -19,15 +20,12 @@ class TagList {
 class CreateArticlePage extends GetView<CreateController> {
   CreateArticlePage({Key? key}) : super(key: key);
   static CreateController createCtrl = Get.find<CreateController>();
-  final _formKey = GlobalKey<FormFieldState>();
+  // final _formKey = GlobalKey<FormFieldState>();
   final _multiSelectKey = GlobalKey<FormFieldState>();
 
   String attachmentId = '';
   String articleId = '';
-  late List<String?> tagNames;
   late List<TagIdName>? tagIdNames;
-  late List<String?> selectedNames;
-  // var tagList = <TagList> [];
 
   void initTags() async {
     tagIdNames = await createCtrl.initArticleTagsList();
@@ -66,7 +64,7 @@ class CreateArticlePage extends GetView<CreateController> {
                       createCtrl.clearCreatePage();
                       articleId = '';
                       attachmentId = '';
-                      debugPrint('Posting article DONE !');
+                      // debugPrint('Posting article DONE !');
                       // Launch a snackbar message
                     }
                   },
@@ -109,34 +107,33 @@ class CreateArticlePage extends GetView<CreateController> {
                   ),
                 ),
                 const Spacer(),
-                const SizedBox(width: 100,),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    // child: TitleField(),
-                    child: SizedBox(
-                      height: 30,
-                      // width: 40,
-                      child: DropdownButton(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        hint: const Text('Select Job Mode'),
-                        value: createCtrl.selectedMode.value.isEmpty ? null : createCtrl.selectedMode.value,
-                        onChanged: (newValue) {
-                          if(attachmentId.isEmpty) {
-                            createCtrl.selectedMode.value = newValue!;
-                          }
-                        },
-                        style: const TextStyle(fontSize: 14, color: ColorApp.white_font),
-                        focusColor: ColorApp.btn_pink,
-                        dropdownColor: ColorApp.btn_pink,
-                        borderRadius: BorderRadius.circular(10),
-                        items: selectionMode.map((choice) {
-                          return DropdownMenuItem(
-                            value: choice,
-                            child: Text(choice, style: const TextStyle(color: ColorApp.white_font),),
-                          );
-                        }).toList(),
-                      ),
+                const SizedBox(width: 260,),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  // child: TitleField(),
+                  child: SizedBox(
+                    height: 30,
+                    // width: 40,
+                    child: DropdownButton(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      hint: const Text('Select Task Mode'),
+                      value: createCtrl.selectedMode.value.isEmpty ? null : createCtrl.selectedMode.value,
+                      onChanged: (newValue) {
+                        if(attachmentId.isEmpty) {
+                          createCtrl.selectedMode.value = newValue!;
+                          // debugPrint('Input mode: ${createCtrl.selectedMode.value}');
+                        }
+                      },
+                      style: const TextStyle(fontSize: 14, color: ColorApp.white_font),
+                      focusColor: ColorApp.btn_grey,
+                      // dropdownColor: ColorApp.btn_pink,
+                      borderRadius: BorderRadius.circular(10),
+                      items: selectionMode.map((choice) {
+                        return DropdownMenuItem(
+                          value: choice,
+                          child: Text(choice, style: const TextStyle(color: ColorApp.black_font),),
+                        );
+                      }).toList(),
                     ),
                   ),
                 ),
@@ -208,21 +205,22 @@ class CreateArticlePage extends GetView<CreateController> {
                     items: createCtrl.items.value,
                     searchable: true,
                     selectedColor: ColorApp.btn_pink,
-                    // selectedItemsTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: ColorApp.white),
                     selectedItemsTextStyle: const TextStyle(color: ColorApp.btn_pink),
                     validator: (values) {
                       if (values == null || values.isEmpty) {
                         return "Required";
                       }
-                      // return null;
                     },
                     onConfirm: (values) {
                       createCtrl.selectedTags.value = values;
+                      createCtrl.itemsSelected.value = createCtrl.selectedTags.value.map(
+                        (item) => MultiSelectItem<TagIdName>(item!, item.name)
+                      ).toList();
                       _multiSelectKey.currentState!.validate();
                       createCtrl.updateSelectedTagsId();
                     },
                     chipDisplay: MultiSelectChipDisplay(
-                      // items: createCtrl.selectedTags.value.map((item) => MultiSelectItem<TagIdName>(item!, item.name)).toList(),
+                      // items: createCtrl.itemsSelected.value,
                       chipColor: ColorApp.btn_pink,
                       textStyle: const TextStyle(color: ColorApp.white_font),
                       decoration: const BoxDecoration(
@@ -239,9 +237,48 @@ class CreateArticlePage extends GetView<CreateController> {
                 const SizedBox(width: 10,),
               ],
             ),
-
             const SizedBox(height: 20,),
-
+            // Article creator field
+            Row(
+              children: <Widget>[
+                const SizedBox(
+                  width: 160,
+                  child: Text(
+                    'Creator',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    child: SizedBox(
+                      height: 40,
+                      child: TextField(
+                        onChanged: (text) {
+                          createCtrl.updateReadiness();
+                        },
+                        controller: createCtrl.creatorCtrl,
+                        textAlignVertical: TextAlignVertical.bottom,
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+                          hintText: 'Article creator',
+                          fillColor: CupertinoColors.secondarySystemFill,
+                          filled: true,
+                          hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
+                        ),
+                        cursorColor: ColorApp.grey_font,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
             // Date creation
             Row(
               children: <Widget>[

@@ -97,68 +97,6 @@ class PostArticleData {
   }
 }
 
-// RESPONSE: tags list query by type
-// class TagsArticleModel {
-//   TagsArticleModel({
-//     required this.success, required this.data, required this.message, required this.error
-//   });
-//   late final String? success;
-//   late final List<dynamic>? data;
-//   late final String? message;
-//   late final String? error;
-//
-//   TagsArticleModel.fromJson(Map<String, dynamic> json) {
-//     success = json['success'];
-//     data = TagsData.fromJson(json['data']) as List<dynamic>;
-//     message = json['message'];
-//     error = json['error'];
-//   }
-//
-//   Map<String, dynamic> toJson() {
-//     final _data = <String, dynamic> {};
-//
-//     _data['success'] = success!;
-//     _data['data'] = data?.map((e) => e.toJson());
-//     _data['message'] = message;
-//     _data['error'] = error;
-//     return _data;
-//   }
-// }
-//
-// class TagsData {
-//   TagsData({
-//     required this.id, required this.type, required this.name,
-//     required this.parent, required this.icon, required this.value
-//   });
-//
-//   late final String? id;
-//   late final String? type;
-//   late final String? name;
-//   late final String? parent;
-//   late final String? icon;
-//   late final String? value;
-//
-//   TagsData.fromJson(List<dynamic> json) {
-//       id = json[0]['id'];
-//       type = json[0]['type'];
-//       name = json[0]['name'];
-//       parent = json[0]['parent'];
-//       icon = json[0]['icon'];
-//       value = json[0]['value'];
-//   }
-//
-//   Map<String, dynamic> toJson(e) {
-//     final data = <String, dynamic> {};
-//     data[e]['id'] = id!;
-//     data[e]['type'] = type!;
-//     data[e]['name'] = name!;
-//     data[e]['parent'] = parent!;
-//     data[e]['icon'] = icon!;
-//     data[e]['value'] = value!;
-//     return data;
-//   }
-// }
-
 @JsonSerializable()
 class TagsArticleModel{
 

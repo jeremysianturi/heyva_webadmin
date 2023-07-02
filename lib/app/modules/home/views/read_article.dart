@@ -1,7 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:multi_select_flutter/bottom_sheet/multi_select_bottom_sheet_field.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
+import '../model/read_article_data.dart';
+import '../../../../constant/colors.dart';
 import '../controllers/menu_controller.dart';
 import '../services/read_client.dart';
 
@@ -9,28 +14,36 @@ import '../services/read_client.dart';
 class ViewArticlePage extends StatelessWidget {
   ViewArticlePage({Key? key}) : super(key: key);
   static ReadController readCtrl = Get.find<ReadController>();
+  final _multiSelectKey = GlobalKey<FormFieldState>();
 
-  final TextEditingController titleEditingController = TextEditingController();
-  final TextEditingController dateEditingController = TextEditingController();
-  final TextEditingController categoryEditingController = TextEditingController();
-  final TextEditingController htmlEditingController = TextEditingController();
+  late List<TagIdName>? tagIdNames;
 
-  void initReadArticles() async {
-    await readCtrl.initArticleList();
+  void initTags() async {
+    tagIdNames = await readCtrl.initArticleTagsList();
+  }
+
+  void initReadArticles(String mode) async {
+    await readCtrl.initArticleList(mode);
   }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     String pageName = sideMenuItems[SideMenuItems.viewArticle.index];
-    if(!readCtrl.gotArticleList.value) {
-      initReadArticles();
+    // if(!readCtrl.gotArticleList.value) {
+    //   initReadArticles();
+    // }
+    final List<String> selectionMode = ['Development', 'Production'];
+
+    if(readCtrl.tagIdNames.isEmpty) {
+      initTags();
     }
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Obx(() => readCtrl.isGettingArticles.value ? Container()
-          : Column(
+        child: Obx(() => readCtrl.viewListMode.value ?
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Row(
@@ -40,16 +53,42 @@ class ViewArticlePage extends StatelessWidget {
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const Spacer(),
-                  // Expanded(
-                  //   child: Padding(
-                  //     padding: const EdgeInsets.all(8.0),
-                  //     child: TitleField(),
-                  //   ),
-                  // ),
+                  const SizedBox(width: 260,),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      height: 30,
+                      child: DropdownButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        hint: const Text('Select Mode'),
+                        alignment: AlignmentDirectional.center,
+                        value: readCtrl.selectedViewMode.value.isEmpty ? null : readCtrl.selectedViewMode.value,
+                        onChanged: (newValue) {
+                          if(readCtrl.selectedViewMode.value != newValue!) {
+                            readCtrl.selectedViewMode.value = newValue!;
+                            readCtrl.gotArticleList.value = false;
+                            initReadArticles(readCtrl.selectedViewMode.value);
+                          }
+                        },
+                        style: const TextStyle(fontSize: 14, color: ColorApp.white_font),
+                        focusColor: ColorApp.btn_grey,
+                        // dropdownColor: ColorApp.btn_pink,
+                        borderRadius: BorderRadius.circular(10),
+                        items: selectionMode.map((choice) {
+                          return DropdownMenuItem(
+                            value: choice,
+                            child: Text(choice, style: const TextStyle(color: ColorApp.black_font),),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 20,),
-              SizedBox(
+              readCtrl.selectedViewMode.value.isEmpty ? const Center(child: Text('Please select task mode first !!!'),)
+              : readCtrl.isGettingArticles.value ? const Center(child: Text('Downloading articles list !!!'),)
+              : SizedBox(
                 width: double.infinity,
                 child: Theme(
                   data: ThemeData.light()
@@ -84,8 +123,8 @@ class ViewArticlePage extends StatelessWidget {
                       ),
                     ),
                     source: ArticleData(
-                      myData: readCtrl.allArticleList.value,
-                      count: readCtrl.allArticleList.value.length,
+                      dataArticle: readCtrl.displayArticleList.value,
+                      count: readCtrl.displayArticleList.value.length,
                     ),
                     rowsPerPage: 10,
                     columnSpacing: 20,
@@ -96,7 +135,529 @@ class ViewArticlePage extends StatelessWidget {
                 ),
               ),
             ],
-          ),
+          )
+          : Column(
+            children: [
+              // Header admin page in view an article
+              Row(
+                children: <Widget>[
+                  Text(
+                    '$pageName :: ${readCtrl.selectedArticle.title}',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  // const Spacer(),
+                ],
+              ),
+              // task mode option "app_env": Development or Production
+              Row(
+                children: [
+                  const Spacer(),
+                  // const SizedBox(width: 260,),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      height: 30,
+                      // width: 40,
+                      child: DropdownButton(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        hint: const Text('Select Task Mode'),
+                        value: readCtrl.selectedArticleMode.value.isEmpty ? null : readCtrl.selectedArticleMode.value,
+                        onChanged: (newValue) {
+                          // if(attachmentId.isEmpty) {
+                          readCtrl.selectedArticleMode.value = newValue!;
+                          // }
+                        },
+                        style: const TextStyle(fontSize: 14, color: ColorApp.white_font),
+                        focusColor: ColorApp.btn_grey,
+                        // dropdownColor: ColorApp.btn_pink,
+                        borderRadius: BorderRadius.circular(10),
+                        items: selectionMode.map((choice) {
+                          return DropdownMenuItem(
+                            enabled: readCtrl.viewUpdateArticleMode.value,
+                            value: choice,
+                            child: Text(choice, style: const TextStyle(color: ColorApp.black_font),),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              // Article title field
+              Row(
+                children: <Widget>[
+                  const SizedBox(
+                    width: 160,
+                    child: Text(
+                      'Title',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      child: SizedBox(
+                        height: 40,
+                        child: TextField(
+                          enabled: readCtrl.viewUpdateArticleMode.value,
+                          onChanged: (text) {
+                            // createCtrl.updateReadiness();
+                          },
+                          controller: readCtrl.titleCtrl,
+                          textAlignVertical: TextAlignVertical.bottom,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                            ),
+                            // hintText: 'Article title',
+                            fillColor: CupertinoColors.secondarySystemFill,
+                            filled: true,
+                            hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
+                          ),
+                          cursorColor: ColorApp.grey_font,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20,),
+              // Multi-select chips for interest article tags selection
+              Row(
+                children: <Widget>[
+                  const SizedBox(
+                    width: 160,
+                    child: Text(
+                      'Article Tags',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  // const SizedBox(width: 10,),
+                  Expanded(
+                    child: readCtrl.viewUpdateArticleMode.value ?
+                      MultiSelectBottomSheetField<TagIdName?>(
+                        key: _multiSelectKey,
+                        initialChildSize: 0.7,
+                        maxChildSize: 0.95,
+                        title: const Text("Interest Tags", style: TextStyle(color: ColorApp.grey_font),),
+                        buttonText: const Text("Selected Tags", style: TextStyle(color: ColorApp.grey_font),),
+                        items: readCtrl.items.value,
+                        searchable: true,
+                        selectedColor: ColorApp.btn_pink,
+                        selectedItemsTextStyle: const TextStyle(color: ColorApp.btn_pink),
+                        validator: (values) {
+                          if (values == null || values.isEmpty) {
+                            return "Required";
+                          } else {
+                            // selected item is true but not displayed
+                            readCtrl.selectedItemsDisplayChip(readCtrl.selectedTags.value.map((tag) => tag!.name).toList());
+                            return readCtrl.listArticleTags(readCtrl.selectedTags.map((x) => x!.name).toList());
+                          }
+                        },
+                        initialValue: readCtrl.selectedTags.value,
+                        autovalidateMode: AutovalidateMode.always,
+                        onConfirm: (values) {
+                          readCtrl.selectedTags.value = values;
+                          readCtrl.itemsSelected.value = readCtrl.selectedTags.value.map(
+                            (tag) => MultiSelectItem<TagIdName>(tag!, tag.name)
+                          ).toList();
+                          _multiSelectKey.currentState!.validate();
+                          readCtrl.updateSelectedTagsId();
+                        },
+                        chipDisplay: MultiSelectChipDisplay(
+                          // read: https://github.com/CHB61/multi_select_flutter/issues/5
+                          items: readCtrl.itemsSelected.value,
+                          chipColor: ColorApp.btn_pink,
+                          textStyle: const TextStyle(color: ColorApp.white_font),
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(2)),
+                          ),
+                          onTap: (item) {
+                            readCtrl.selectedTags.value.remove(item);
+                            _multiSelectKey.currentState!.validate();
+                            readCtrl.updateSelectedTagsId();
+                          },
+                        ),
+                      )
+                      : Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                        child: TextField(
+                          // enabled: readCtrl.viewUpdateArticleMode.value,
+                          enabled: false,
+                          minLines: 1,
+                          maxLines: 2,
+                          onChanged: (text) {
+                          },
+                          controller: readCtrl.tagCtrl,
+                          textAlignVertical: TextAlignVertical.bottom,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                            ),
+                            fillColor: CupertinoColors.secondarySystemFill,
+                            filled: true,
+                            hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
+                          ),
+                          cursorColor: ColorApp.grey_font,
+                        ),
+                      ),
+                  ),
+                  const SizedBox(width: 10,),
+                ],
+              ),
+              const SizedBox(height: 20,),
+              // Article creator field
+              Row(
+                children: <Widget>[
+                  const SizedBox(
+                    width: 160,
+                    child: Text(
+                      'Creator',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                      child: SizedBox(
+                        height: 40,
+                        child: TextField(
+                          enabled: readCtrl.viewUpdateArticleMode.value,
+                          onChanged: (text) {
+                            // createCtrl.updateReadiness();
+                          },
+                          controller: readCtrl.creatorCtrl,
+                          textAlignVertical: TextAlignVertical.bottom,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide.none,
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                            ),
+                            hintText: 'Article creator',
+                            fillColor: CupertinoColors.secondarySystemFill,
+                            filled: true,
+                            hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
+                          ),
+                          cursorColor: ColorApp.grey_font,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20,),
+
+              // Date creation
+              // Row(
+              //   children: <Widget>[
+              //     const SizedBox(
+              //       width: 160,
+              //       child: Text(
+              //         'Date',
+              //         style: TextStyle(
+              //           fontSize: 16,
+              //           fontWeight: FontWeight.normal,
+              //         ),
+              //       ),
+              //     ),
+              //     Expanded(
+              //       child: Padding(
+              //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              //         child: SelectDate(controller: createCtrl.dateCtrl,),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // Photo selection
+              // Padding(
+              //   padding: const EdgeInsets.only(top:8.0, right: 8.0, bottom: 8.0),
+              //   child: Row(
+              //     children: <Widget>[
+              //       const SizedBox(
+              //         width: 160,
+              //         child: Text(
+              //           'Photo',
+              //           style: TextStyle(
+              //             fontSize: 16,
+              //             fontWeight: FontWeight.normal,
+              //           ),
+              //         ),
+              //       ),
+              //       const SizedBox(width: 10),
+              //       createCtrl.isSelectedImage ?
+              //       createCtrl.gotAttachmentId.value ?
+              //       ElevatedButton(
+              //         onPressed: () {
+              //           createCtrl.clearPhotoAndId();
+              //           attachmentId = '';
+              //         },
+              //         style: ButtonStyle(
+              //           padding: MaterialStateProperty.all(
+              //               const EdgeInsets.symmetric(
+              //                   horizontal: 10.0,
+              //                   vertical: 10.0)
+              //           ),
+              //           textStyle: MaterialStateProperty.all(
+              //             const TextStyle(fontSize: 16),
+              //           ),
+              //           backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
+              //           shape: MaterialStateProperty.all(
+              //             RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(10),
+              //             ),
+              //           ),
+              //         ),
+              //         child: const Row(
+              //           children: <Widget>[
+              //             Icon(Icons.delete),
+              //             SizedBox(width: 5),
+              //             Text('Cancel')
+              //           ],
+              //         ),
+              //       )
+              //           : ElevatedButton(
+              //         onPressed: () async {
+              //           if(createCtrl.selectedMode.value.isNotEmpty) {
+              //             await createCtrl.getAttachmentId();
+              //             attachmentId = createCtrl.attachmentId.value;
+              //             if (attachmentId.isEmpty) {
+              //               // Error handler
+              //             }
+              //           }
+              //         },
+              //         style: ButtonStyle(
+              //           padding: MaterialStateProperty.all(
+              //               const EdgeInsets.symmetric(
+              //                   horizontal: 10.0,
+              //                   vertical: 10.0)
+              //           ),
+              //           textStyle: MaterialStateProperty.all(
+              //             const TextStyle(fontSize: 16),
+              //           ),
+              //           backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
+              //           shape: MaterialStateProperty.all(
+              //             RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(10),
+              //             ),
+              //           ),
+              //         ),
+              //         child: const Row(
+              //           children: <Widget>[
+              //             Icon(Icons.app_registration),
+              //             SizedBox(width: 5),
+              //             Text('Request Id')
+              //           ],
+              //         ),
+              //       )
+              //           : ElevatedButton(
+              //         onPressed: () async {
+              //           await createCtrl.selectImage();
+              //           if(createCtrl.imageFileName.isEmpty) {
+              //             // Launch a snackbar message
+              //             // Error handler
+              //           }
+              //         },
+              //         style: ButtonStyle(
+              //           padding: MaterialStateProperty.all(
+              //               const EdgeInsets.symmetric(
+              //                   horizontal: 10.0,
+              //                   vertical: 10.0)
+              //           ),
+              //           textStyle: MaterialStateProperty.all(
+              //             const TextStyle(fontSize: 16),
+              //           ),
+              //           backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
+              //           shape: MaterialStateProperty.all(
+              //             RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(10),
+              //             ),
+              //           ),
+              //         ),
+              //         child: const Row(
+              //           children: <Widget>[
+              //             Icon(Icons.file_upload),
+              //             SizedBox(width: 5),
+              //             Text('Select Photo')
+              //           ],
+              //         ),
+              //       ),
+              //
+              //       const SizedBox(width: 20),
+              //       createCtrl.imageFileName.isNotEmpty ?
+              //       Text(
+              //         createCtrl.imageFileName,
+              //         style: const TextStyle(
+              //             fontWeight: FontWeight.bold,
+              //             fontStyle: FontStyle.italic),
+              //       )
+              //           : const Text(''),
+              //
+              //       const SizedBox(width: 20),
+              //       createCtrl.isSelectedImage ?
+              //       createCtrl.gotAttachmentId.value ?
+              //       const Text('')
+              //           : ElevatedButton(
+              //         onPressed: () async {
+              //           createCtrl.clearPhotoAndId();
+              //           await createCtrl.selectImage();
+              //           if(createCtrl.imageFileName.isEmpty) {
+              //             // Launch a snackbar message
+              //             // Error handler
+              //           }
+              //         },
+              //         style: ButtonStyle(
+              //           padding: MaterialStateProperty.all(
+              //               const EdgeInsets.symmetric(
+              //                   horizontal: 10.0,
+              //                   vertical: 10.0)
+              //           ),
+              //           textStyle: MaterialStateProperty.all(
+              //             const TextStyle(fontSize: 16),
+              //           ),
+              //           backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
+              //           shape: MaterialStateProperty.all(
+              //             RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(10),
+              //             ),
+              //           ),
+              //         ),
+              //         child: const Row(
+              //           children: <Widget>[
+              //             Icon(Icons.file_upload),
+              //             SizedBox(width: 5),
+              //             Text('Change Photo')
+              //           ],
+              //         ),
+              //       )
+              //           : const Text(''),
+              //       Expanded(
+              //         child: createCtrl.gotAttachmentId.value ?
+              //         Text('Id: ${createCtrl.attachmentId}')
+              //             : const Text(""),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 20,),
+              // Photo widget container
+              // createCtrl.imageBytes.value.isEmpty ?
+              // const Text(
+              //     "Press to select photo.",
+              //     style: TextStyle(color: ColorApp.grey_container)
+              // )
+              //     : SizedBox(
+              //   height: 400,
+              //   child: Row(
+              //     children: [
+              //       const SizedBox(width: 160,),
+              //       Expanded(
+              //         // height: 400,
+              //         // width: width / 2,
+              //         child: Image.memory(createCtrl.imageBytes.value),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+
+              const SizedBox(height: 20,),
+              // Content body - rendered html
+              const Padding(
+                padding: EdgeInsets.only(top:8.0, right: 8.0, bottom: 8.0),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 160,
+                      child: Text(
+                        'Article content',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                    Spacer()
+                  ],
+                ),
+              ),
+              Container(
+                height: 600,
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                // color: ColorApp.grey_divider,
+                child: TextField(
+                  enabled: readCtrl.viewUpdateArticleMode.value,
+                  onTap: () {
+                    // createCtrl.updateReadiness();
+                  },
+                  controller: readCtrl.htmlCtrl,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    // hintText: 'Article content [html]',
+                    fillColor: CupertinoColors.secondarySystemFill,
+                    filled: true,
+                    hintStyle: TextStyle(color: Colors.black12, fontStyle: FontStyle.italic),
+                  ),
+                  cursorColor: Colors.black,
+                  maxLines: 1000,
+                  style: const TextStyle(color: ColorApp.grey_font),
+                ),
+              ),
+              const SizedBox(height: 20,),
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 200.0, top: 8.0, right: 200, bottom: 8),
+                  child: Row(
+                    children: [
+                      readCtrl.viewUpdateArticleMode.value ?
+                      ElevatedButton(
+                        onPressed: () {
+                          readCtrl.restoreSelectedArticle();
+                          readCtrl.viewUpdateArticleMode.value = false;
+                        },
+                        child: const Text('Cancel'),
+                      )
+                      : ElevatedButton(
+                        onPressed: () {
+                          readCtrl.viewUpdateArticleMode.value = false;
+                          readCtrl.viewListMode.value = true;
+                        },
+                        child: const Text('Close'),
+                      ),
+                      const Spacer(),
+                      readCtrl.viewUpdateArticleMode.value ?
+                      ElevatedButton(
+                        onPressed: () { },
+                        child: const Text('Save'),
+                      )
+                      : ElevatedButton(
+                        onPressed: () {
+                          for(int i=0 ; i < readCtrl.itemsSelected.value.length ; i++) {
+                            readCtrl.itemsSelected.value[i].selected = true;
+                          }
+                          readCtrl.viewUpdateArticleMode.value = true;
+                        },
+                        child: const Text('Edit'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          )
         ),
       ),
     );
@@ -141,22 +702,28 @@ class ViewArticlePage extends StatelessWidget {
 }
 
 class ArticleData extends DataTableSource {
-  var myData;
+  var dataArticle;
   final count;
   ArticleData({
-    required this.myData,
+    required this.dataArticle,
     required this.count,
   });
+  static ReadController readCtrl = Get.find<ReadController>();
 
-  void viewArticle() {
-    debugPrint('this will invoke a widget to display an article !');
+  void viewArticle(int index, String id) {
+    bool found;
+    // dispatch method to display the selected article on index basis
+    if(!(found = readCtrl.getSelectedArticle(id))) {
+      debugPrint('Article not exist !');
+    } else {
+      debugPrint('this will invoke a widget to display article[$index]: "$id" !');
+    }
   }
 
   @override
   DataRow? getRow(int index) {
     if (index < rowCount) {
-      // return recentFileDataRow(myData![index]);
-      return recentFileDataRow(myData![index], index, viewArticle);
+      return recentFileDataRow(dataArticle![index], index, viewArticle);
     } else {
       return null;
     }
@@ -176,15 +743,8 @@ class ArticleData extends DataTableSource {
 DataRow recentFileDataRow(var data, int index, Function onSelectRow) {
   return DataRow.byIndex(
     index: index,
-    // selected: data.selected,
-    // onSelectChanged: (value) {
-    //   if(data.selected != value) {
-    //     data.selected = value;
-    //     onSelectRow();
-    //   }
-    // },
     cells: [
-      DataCell(Text(data.title ?? "Title")),
+      DataCell(Text(data.title ?? "Title"), onTap: () => onSelectRow(index, data.id)),
       DataCell(Text(data.creator ?? "Literature / News")),
       DataCell(Text(data.tags)),
     ],

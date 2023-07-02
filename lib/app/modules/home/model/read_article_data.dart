@@ -1,4 +1,6 @@
 
+import 'package:json_annotation/json_annotation.dart';
+
 class GetArticleList {
   GetArticleList({
     required this.success,
@@ -169,4 +171,94 @@ class ArticleListTable {
   // String htmlBody;
 
   ArticleListTable({required this.id, required this.title, this.creator, required this.tags/*, required this.htmlBody*/});
+}
+@JsonSerializable()
+class TagsArticleModel{
+
+  @JsonKey(name : "success")
+  String? success;
+
+  @JsonKey(name : "data")
+  List<TagsData>? data;
+
+  @JsonKey(name : "message")
+  String? message;
+
+  @JsonKey(name : "error")
+  String? error;
+
+  TagsArticleModel({required this.success, required this.data, required this.message, required this.error});
+
+  factory TagsArticleModel.fromJson(Map<String, dynamic> json) => _$TagsArticleModelFromJson(json);
+  Map<String, dynamic> toJson() => _$TagsArticleModelToJson(this);
+}
+
+@JsonSerializable()
+class TagsData {
+
+  @JsonKey(name : "id")
+  String? id;
+
+  @JsonKey(name : "type")
+  String? type;
+
+  @JsonKey(name : "name")
+  String? name;
+
+  @JsonKey(name : "parent")
+  String? parent;
+
+  @JsonKey(name : "icon")
+  String? icon;
+
+  @JsonKey(name : "value")
+  String? value;
+
+  TagsData({required this.id, required this.type, required this.name, required this.parent, required this.icon, required this.value});
+
+  factory TagsData.fromJson(Map<String, dynamic> json) => _$TagsDataFromJson(json);
+  Map<String, dynamic> toJson() => _$TagsDataToJson(this);
+
+}
+
+TagsArticleModel _$TagsArticleModelFromJson(Map<String, dynamic> json) =>
+    TagsArticleModel(
+      success: json['success'] as String?,
+      data: (json['data'] as List<dynamic>)
+          .map((e) => TagsData.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      message: json['message'] as String?,
+      error: json['error'] as String?,
+    );
+
+Map<String, dynamic> _$TagsArticleModelToJson(TagsArticleModel instance) =>
+    <String, dynamic>{
+      'success': instance.success,
+      'data': instance.data,
+      'message': instance.message,
+      'error': instance.error,
+    };
+
+TagsData _$TagsDataFromJson(Map<String, dynamic> json) => TagsData(
+  id: json['id'] as String?,
+  type: json['type'] as String?,
+  name: json['name'] as String?,
+  parent: json['parent'] as String?,
+  icon: json['icon'] as String?,
+  value: json['value'] as String?,
+);
+
+Map<String, dynamic> _$TagsDataToJson(TagsData instance) => <String, dynamic>{
+  'id': instance.id,
+  'type': instance.type,
+  'name': instance.name,
+  'parent': instance.parent,
+  'icon': instance.icon,
+  'value': instance.value,
+};
+
+class TagIdName {
+  String id;
+  String name;
+  TagIdName({required this.id, required this.name});
 }
