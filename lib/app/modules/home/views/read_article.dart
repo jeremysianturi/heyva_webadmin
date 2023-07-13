@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:multi_select_flutter/bottom_sheet/multi_select_bottom_sheet_field.dart';
-import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 import '../model/read_article_data.dart';
@@ -30,9 +28,6 @@ class ViewArticlePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     String pageName = sideMenuItems[SideMenuItems.viewArticle.index];
-    // if(!readCtrl.gotArticleList.value) {
-    //   initReadArticles();
-    // }
     final List<String> selectionMode = ['Development', 'Production'];
 
     if(readCtrl.tagIdNames.isEmpty) {
@@ -255,25 +250,27 @@ class ViewArticlePage extends StatelessWidget {
                         validator: (values) {
                           if (values == null || values.isEmpty) {
                             return "Required";
-                          } else {
-                            // selected item is true but not displayed
-                            readCtrl.selectedItemsDisplayChip(readCtrl.selectedTags.value.map((tag) => tag!.name).toList());
-                            return readCtrl.listArticleTags(readCtrl.selectedTags.map((x) => x!.name).toList());
                           }
+                          return null;
                         },
-                        initialValue: readCtrl.selectedTags.value,
-                        autovalidateMode: AutovalidateMode.always,
+                        initialValue: readCtrl.initialArticleTags.map((x) =>
+                          readCtrl.tagIdNames.firstWhere((e) => e.name == x.name)).toList(),
                         onConfirm: (values) {
+                          // if(readCtrl.firstTransaction.value) {
+                          //   for(int i=0 ; i < readCtrl.initialArticleTags.length ; i++) {
+                          //     values.addAll([readCtrl.tagIdNames.firstWhere(
+                          //         (e) => e.name == readCtrl.initialArticleTags[i].name)
+                          //     ]);
+                          //   }
+                          //   readCtrl.firstTransaction.value = false;
+                          // }
                           readCtrl.selectedTags.value = values;
-                          readCtrl.itemsSelected.value = readCtrl.selectedTags.value.map(
-                            (tag) => MultiSelectItem<TagIdName>(tag!, tag.name)
-                          ).toList();
                           _multiSelectKey.currentState!.validate();
                           readCtrl.updateSelectedTagsId();
                         },
                         chipDisplay: MultiSelectChipDisplay(
                           // read: https://github.com/CHB61/multi_select_flutter/issues/5
-                          items: readCtrl.itemsSelected.value,
+                          // items: readCtrl.itemsSelected.value,
                           chipColor: ColorApp.btn_pink,
                           textStyle: const TextStyle(color: ColorApp.white_font),
                           decoration: const BoxDecoration(
@@ -356,220 +353,6 @@ class ViewArticlePage extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20,),
-
-              // Date creation
-              // Row(
-              //   children: <Widget>[
-              //     const SizedBox(
-              //       width: 160,
-              //       child: Text(
-              //         'Date',
-              //         style: TextStyle(
-              //           fontSize: 16,
-              //           fontWeight: FontWeight.normal,
-              //         ),
-              //       ),
-              //     ),
-              //     Expanded(
-              //       child: Padding(
-              //         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              //         child: SelectDate(controller: createCtrl.dateCtrl,),
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              // Photo selection
-              // Padding(
-              //   padding: const EdgeInsets.only(top:8.0, right: 8.0, bottom: 8.0),
-              //   child: Row(
-              //     children: <Widget>[
-              //       const SizedBox(
-              //         width: 160,
-              //         child: Text(
-              //           'Photo',
-              //           style: TextStyle(
-              //             fontSize: 16,
-              //             fontWeight: FontWeight.normal,
-              //           ),
-              //         ),
-              //       ),
-              //       const SizedBox(width: 10),
-              //       createCtrl.isSelectedImage ?
-              //       createCtrl.gotAttachmentId.value ?
-              //       ElevatedButton(
-              //         onPressed: () {
-              //           createCtrl.clearPhotoAndId();
-              //           attachmentId = '';
-              //         },
-              //         style: ButtonStyle(
-              //           padding: MaterialStateProperty.all(
-              //               const EdgeInsets.symmetric(
-              //                   horizontal: 10.0,
-              //                   vertical: 10.0)
-              //           ),
-              //           textStyle: MaterialStateProperty.all(
-              //             const TextStyle(fontSize: 16),
-              //           ),
-              //           backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
-              //           shape: MaterialStateProperty.all(
-              //             RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //           ),
-              //         ),
-              //         child: const Row(
-              //           children: <Widget>[
-              //             Icon(Icons.delete),
-              //             SizedBox(width: 5),
-              //             Text('Cancel')
-              //           ],
-              //         ),
-              //       )
-              //           : ElevatedButton(
-              //         onPressed: () async {
-              //           if(createCtrl.selectedMode.value.isNotEmpty) {
-              //             await createCtrl.getAttachmentId();
-              //             attachmentId = createCtrl.attachmentId.value;
-              //             if (attachmentId.isEmpty) {
-              //               // Error handler
-              //             }
-              //           }
-              //         },
-              //         style: ButtonStyle(
-              //           padding: MaterialStateProperty.all(
-              //               const EdgeInsets.symmetric(
-              //                   horizontal: 10.0,
-              //                   vertical: 10.0)
-              //           ),
-              //           textStyle: MaterialStateProperty.all(
-              //             const TextStyle(fontSize: 16),
-              //           ),
-              //           backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
-              //           shape: MaterialStateProperty.all(
-              //             RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //           ),
-              //         ),
-              //         child: const Row(
-              //           children: <Widget>[
-              //             Icon(Icons.app_registration),
-              //             SizedBox(width: 5),
-              //             Text('Request Id')
-              //           ],
-              //         ),
-              //       )
-              //           : ElevatedButton(
-              //         onPressed: () async {
-              //           await createCtrl.selectImage();
-              //           if(createCtrl.imageFileName.isEmpty) {
-              //             // Launch a snackbar message
-              //             // Error handler
-              //           }
-              //         },
-              //         style: ButtonStyle(
-              //           padding: MaterialStateProperty.all(
-              //               const EdgeInsets.symmetric(
-              //                   horizontal: 10.0,
-              //                   vertical: 10.0)
-              //           ),
-              //           textStyle: MaterialStateProperty.all(
-              //             const TextStyle(fontSize: 16),
-              //           ),
-              //           backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
-              //           shape: MaterialStateProperty.all(
-              //             RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //           ),
-              //         ),
-              //         child: const Row(
-              //           children: <Widget>[
-              //             Icon(Icons.file_upload),
-              //             SizedBox(width: 5),
-              //             Text('Select Photo')
-              //           ],
-              //         ),
-              //       ),
-              //
-              //       const SizedBox(width: 20),
-              //       createCtrl.imageFileName.isNotEmpty ?
-              //       Text(
-              //         createCtrl.imageFileName,
-              //         style: const TextStyle(
-              //             fontWeight: FontWeight.bold,
-              //             fontStyle: FontStyle.italic),
-              //       )
-              //           : const Text(''),
-              //
-              //       const SizedBox(width: 20),
-              //       createCtrl.isSelectedImage ?
-              //       createCtrl.gotAttachmentId.value ?
-              //       const Text('')
-              //           : ElevatedButton(
-              //         onPressed: () async {
-              //           createCtrl.clearPhotoAndId();
-              //           await createCtrl.selectImage();
-              //           if(createCtrl.imageFileName.isEmpty) {
-              //             // Launch a snackbar message
-              //             // Error handler
-              //           }
-              //         },
-              //         style: ButtonStyle(
-              //           padding: MaterialStateProperty.all(
-              //               const EdgeInsets.symmetric(
-              //                   horizontal: 10.0,
-              //                   vertical: 10.0)
-              //           ),
-              //           textStyle: MaterialStateProperty.all(
-              //             const TextStyle(fontSize: 16),
-              //           ),
-              //           backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
-              //           shape: MaterialStateProperty.all(
-              //             RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(10),
-              //             ),
-              //           ),
-              //         ),
-              //         child: const Row(
-              //           children: <Widget>[
-              //             Icon(Icons.file_upload),
-              //             SizedBox(width: 5),
-              //             Text('Change Photo')
-              //           ],
-              //         ),
-              //       )
-              //           : const Text(''),
-              //       Expanded(
-              //         child: createCtrl.gotAttachmentId.value ?
-              //         Text('Id: ${createCtrl.attachmentId}')
-              //             : const Text(""),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // const SizedBox(height: 20,),
-              // Photo widget container
-              // createCtrl.imageBytes.value.isEmpty ?
-              // const Text(
-              //     "Press to select photo.",
-              //     style: TextStyle(color: ColorApp.grey_container)
-              // )
-              //     : SizedBox(
-              //   height: 400,
-              //   child: Row(
-              //     children: [
-              //       const SizedBox(width: 160,),
-              //       Expanded(
-              //         // height: 400,
-              //         // width: width / 2,
-              //         child: Image.memory(createCtrl.imageBytes.value),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-
               const SizedBox(height: 20,),
               // Content body - rendered html
               const Padding(
