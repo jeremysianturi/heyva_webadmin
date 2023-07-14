@@ -119,6 +119,8 @@ class ReadController extends GetxController {
   var itemsSelected = <MultiSelectItem<TagIdName>>[].obs;
   List<String> selectedTagsId = [];
   var gotTagsList = false.obs;
+  // var firstTransaction = true.obs;
+  List<TagIdName> initialArticleTags = [];
 
   var getArticleListResponse =
       GetArticleList(success: "", data: null, message: "", error: "", links: null, count: null).obs;
@@ -288,6 +290,7 @@ class ReadController extends GetxController {
 
   bool getSelectedArticle(String id) {
     bool found = false;
+    // firstTransaction.value = true;
 
     for(var i=0 ; i < fullArticlesList!.length ; i++) {
       if(fullArticlesList?[i].id == id) {
@@ -295,17 +298,9 @@ class ReadController extends GetxController {
         titleCtrl.text = selectedArticle.title!;
         tagCtrl.text = listArticleTags(selectedArticle.tags?.map((x) => x.tag?.name).toList() as List<String?>);
         // initialize selected tags in multiselect chip
-        selectedTags.value = selectedArticle.tags!.map(
-          (e) => (TagIdName(id: e.tag!.id!, name: e.tag!.name!))
-        ).cast<TagIdName?>().toList();
-        // initialize selected display-chip tag items
-        itemsSelected.value = selectedTags.value.map(
-                (tag) => MultiSelectItem<TagIdName>(tag!, tag.name)
+        initialArticleTags = selectedArticle.tags!.map(
+                (e) => TagIdName(id: e.tag!.id!, name: e.tag!.name!)
         ).toList();
-        // initialize selected display-chip tag items = true
-        selectedItemsDisplayChip(selectedTags.value.map((tag) => tag!.name).toList());
-        // initialize selected tag-id`s in multiselect chip => updateSelectedTagsId()
-        selectedTagsId = selectedTags.value.map((e) => e!.id).toList();
         creatorCtrl.text = selectedArticle.creator!;
         htmlCtrl.text = selectedArticle.renderedBody!;
         found = true;
@@ -320,29 +315,22 @@ class ReadController extends GetxController {
   }
 
   restoreSelectedArticle() {
+    // firstTransaction.value = true;
     titleCtrl.text = selectedArticle.title!;
     creatorCtrl.text = selectedArticle.creator!;
     htmlCtrl.text = selectedArticle.renderedBody!;
-    for(int i=0 ; i < items.value.length ; i++) {
-      items.value[i].selected = false;
-    }
     tagCtrl.text = listArticleTags(selectedArticle.tags?.map((x) => x.tag?.name).toList() as List<String?>);
     // initialize selected tags in multiselect chip
-    selectedTags.value = selectedArticle.tags!.map(
-            (e) => (TagIdName(id: e.tag!.id!, name: e.tag!.name!))
-    ).cast<TagIdName?>().toList();
-    // initialize selected display-chip tag items
-    itemsSelected.value = selectedTags.value.map(
-            (tag) => MultiSelectItem<TagIdName>(tag!, tag.name)
-    ).toList();
-    // initialize selected display-chip tag items = true
-    selectedItemsDisplayChip(selectedTags.value.map((tag) => tag!.name).toList());
-    // initialize selected tag-id`s in multiselect chip => updateSelectedTagsId()
-    selectedTagsId = selectedTags.value.map((e) => e!.id).toList();
+    initialArticleTags = selectedArticle.tags!.map(
+            (e) => TagIdName(id: e.tag!.id!, name: e.tag!.name!)
+    ).cast<TagIdName>().toList();
     viewListMode.value = false;
     selectedArticleMode.value = selectedViewMode.value;
   }
   updateSelectedTagsId() {
+    itemsSelected.value = selectedTags.value.map(
+            (tag) => MultiSelectItem<TagIdName>(tag!, tag.name)
+    ).toList();
     selectedTagsId = selectedTags.value.map((e) => e!.id).toList();
   }
 
