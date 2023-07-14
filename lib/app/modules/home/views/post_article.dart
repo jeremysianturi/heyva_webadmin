@@ -80,8 +80,8 @@ class CreateArticlePage extends GetView<CreateController> {
                       ),
                     ),
                   ),
-                  child: const Row(
-                    children: <Widget>[
+                  child: Row(
+                    children: const <Widget>[
                       Text('Submit')
                     ],
                   ),
@@ -100,8 +100,8 @@ class CreateArticlePage extends GetView<CreateController> {
                       ),
                     ),
                   ),
-                  child: const Row(
-                    children: <Widget>[
+                  child: Row(
+                    children: const <Widget>[
                       Text('Compose')
                     ],
                   ),
@@ -115,7 +115,7 @@ class CreateArticlePage extends GetView<CreateController> {
                     height: 30,
                     // width: 40,
                     child: DropdownButton(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      // padding: const EdgeInsets.symmetric(horizontal: 20),
                       hint: const Text('Select Task Mode'),
                       value: createCtrl.selectedMode.value.isEmpty ? null : createCtrl.selectedMode.value,
                       onChanged: (newValue) {
@@ -339,8 +339,8 @@ class CreateArticlePage extends GetView<CreateController> {
                             ),
                           ),
                         ),
-                        child: const Row(
-                          children: <Widget>[
+                        child: Row(
+                          children: const <Widget>[
                             Icon(Icons.delete),
                             SizedBox(width: 5),
                             Text('Cancel')
@@ -373,8 +373,8 @@ class CreateArticlePage extends GetView<CreateController> {
                           ),
                         ),
                       ),
-                      child: const Row(
-                        children: <Widget>[
+                      child: Row(
+                        children: const <Widget>[
                           Icon(Icons.app_registration),
                           SizedBox(width: 5),
                           Text('Request Id')
@@ -405,8 +405,8 @@ class CreateArticlePage extends GetView<CreateController> {
                           ),
                         ),
                       ),
-                      child: const Row(
-                        children: <Widget>[
+                      child: Row(
+                        children: const <Widget>[
                           Icon(Icons.file_upload),
                           SizedBox(width: 5),
                           Text('Select Photo')
@@ -453,8 +453,8 @@ class CreateArticlePage extends GetView<CreateController> {
                           ),
                         ),
                       ),
-                      child: const Row(
-                        children: <Widget>[
+                      child: Row(
+                        children: const <Widget>[
                           Icon(Icons.file_upload),
                           SizedBox(width: 5),
                           Text('Change Photo')
@@ -529,8 +529,8 @@ class CreateArticlePage extends GetView<CreateController> {
                         ),
                       ),
                     ),
-                    child: const Row(
-                      children: <Widget>[
+                    child: Row(
+                      children: const <Widget>[
                         Icon(Icons.file_upload),
                         SizedBox(width: 5),
                         Text('Upload Article')

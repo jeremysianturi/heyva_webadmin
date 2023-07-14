@@ -54,7 +54,7 @@ class LoginView extends GetView<LoginController> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Row(
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
@@ -211,13 +211,13 @@ class LoginView extends GetView<LoginController> {
                       ],
                     ),
                   ),
-                  const Expanded(
+                  Expanded(
                     flex: 1,
                     child: Padding(
                       padding: EdgeInsets.only(bottom: 55),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                        children: const [
                           Text(
                             Strings.cant_login,
                             textAlign: TextAlign.center,

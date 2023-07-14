@@ -59,7 +59,7 @@ class ViewArticlePage extends StatelessWidget {
                     child: SizedBox(
                       height: 30,
                       child: DropdownButton(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        // padding: const EdgeInsets.symmetric(horizontal: 20),
                         hint: const Text('Select Mode'),
                         alignment: AlignmentDirectional.center,
                         value: readCtrl.selectedViewMode.value.isEmpty ? null : readCtrl.selectedViewMode.value,
@@ -128,8 +128,8 @@ class ViewArticlePage extends StatelessWidget {
                     ),
                     rowsPerPage: 10,
                     columnSpacing: 20,
-                    dataRowMaxHeight: 38,
-                    dataRowMinHeight: 28,
+                    // dataRowMaxHeight: 38,
+                    // dataRowMinHeight: 28,
                     columns: getColumns(),
                   ),
                 ),
@@ -159,7 +159,7 @@ class ViewArticlePage extends StatelessWidget {
                       height: 30,
                       // width: 40,
                       child: DropdownButton(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        // padding: const EdgeInsets.symmetric(horizontal: 20),
                         hint: const Text('Select Task Mode'),
                         value: readCtrl.selectedArticleMode.value.isEmpty ? null : readCtrl.selectedArticleMode.value,
                         onChanged: (newValue) {
@@ -572,10 +572,10 @@ class ViewArticlePage extends StatelessWidget {
 
               const SizedBox(height: 20,),
               // Content body - rendered html
-              const Padding(
-                padding: EdgeInsets.only(top:8.0, right: 8.0, bottom: 8.0),
+              Padding(
+                padding: const EdgeInsets.only(top:8.0, right: 8.0, bottom: 8.0),
                 child: Row(
-                  children: [
+                  children: const [
                     SizedBox(
                       width: 160,
                       child: Text(
