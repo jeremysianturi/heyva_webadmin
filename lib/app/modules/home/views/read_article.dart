@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
-
 import '../model/read_article_data.dart';
 import '../../../../constant/colors.dart';
 import '../controllers/menu_controller.dart';
@@ -15,6 +15,7 @@ class ViewArticlePage extends StatelessWidget {
   final _multiSelectKey = GlobalKey<FormFieldState>();
 
   late List<TagIdName>? tagIdNames;
+  late String articleId;
 
   void initTags() async {
     tagIdNames = await readCtrl.initArticleTagsList();
@@ -60,9 +61,9 @@ class ViewArticlePage extends StatelessWidget {
                         value: readCtrl.selectedViewMode.value.isEmpty ? null : readCtrl.selectedViewMode.value,
                         onChanged: (newValue) {
                           if(readCtrl.selectedViewMode.value != newValue!) {
-                            readCtrl.selectedViewMode.value = newValue!;
+                            readCtrl.selectedViewMode.value = newValue;
                             readCtrl.gotArticleList.value = false;
-                            initReadArticles(readCtrl.selectedViewMode.value);
+                            initReadArticles(readCtrl.selectedViewMode.value.toLowerCase());
                           }
                         },
                         style: const TextStyle(fontSize: 14, color: ColorApp.white_font),
@@ -82,7 +83,12 @@ class ViewArticlePage extends StatelessWidget {
               ),
               const SizedBox(height: 20,),
               readCtrl.selectedViewMode.value.isEmpty ? const Center(child: Text('Please select task mode first !!!'),)
-              : readCtrl.isGettingArticles.value ? const Center(child: Text('Downloading articles list !!!'),)
+              // : readCtrl.isGettingArticles.value ? const Center(child: Text('Downloading articles list !!!'),)
+              : readCtrl.isGettingArticles.value ? const Center(child: CircularProgressIndicator(
+                backgroundColor: ColorApp.grey_card_font,
+                valueColor: AlwaysStoppedAnimation<Color>(ColorApp.btn_pink),
+
+              ),)
               : SizedBox(
                 width: double.infinity,
                 child: Theme(
@@ -120,6 +126,7 @@ class ViewArticlePage extends StatelessWidget {
                     source: ArticleData(
                       dataArticle: readCtrl.displayArticleList.value,
                       count: readCtrl.displayArticleList.value.length,
+                      context: context,
                     ),
                     rowsPerPage: 10,
                     columnSpacing: 20,
@@ -293,7 +300,7 @@ class ViewArticlePage extends StatelessWidget {
                           onChanged: (text) {
                           },
                           controller: readCtrl.tagCtrl,
-                          textAlignVertical: TextAlignVertical.bottom,
+                          textAlignVertical: TextAlignVertical.top,
                           decoration: const InputDecoration(
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none,
@@ -423,15 +430,22 @@ class ViewArticlePage extends StatelessWidget {
                       const Spacer(),
                       readCtrl.viewUpdateArticleMode.value ?
                       ElevatedButton(
-                        onPressed: () { },
+                        onPressed: () async {
+                          articleId = await readCtrl.updateArticle(readCtrl.selectedTagsId);
+                          resetAfterArticleUpdate();
+                        },
                         child: const Text('Save'),
                       )
                       : ElevatedButton(
                         onPressed: () {
+                          debugPrint("check value readCtrl: ${readCtrl.itemsSelected}");
                           for(int i=0 ; i < readCtrl.itemsSelected.value.length ; i++) {
                             readCtrl.itemsSelected.value[i].selected = true;
                           }
                           readCtrl.viewUpdateArticleMode.value = true;
+                          readCtrl.selectedTags.value = readCtrl.initialArticleTags.map((x) =>
+                              readCtrl.tagIdNames.firstWhere((e) => e.name == x.name)).toList();
+                          readCtrl.updateSelectedTagsId();
                         },
                         child: const Text('Edit'),
                       ),
@@ -444,6 +458,13 @@ class ViewArticlePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void resetAfterArticleUpdate() {
+    readCtrl.viewUpdateArticleMode.value = false;
+    readCtrl.viewListMode.value = true;
+    readCtrl.gotArticleList.value = false;
+    initReadArticles(readCtrl.selectedViewMode.value.toLowerCase());
   }
 
   List<DataColumn> getColumns() {
@@ -478,8 +499,14 @@ class ViewArticlePage extends StatelessWidget {
           style: TextStyle(
               fontWeight: FontWeight.w600, fontSize: 14),
         ),
-      )
-
+      ),
+      const DataColumn(
+        label: Text(
+          "",
+          style: TextStyle(
+              fontWeight: FontWeight.w600, fontSize: 14),
+        ),
+      ),
     ];
   }
 }
@@ -487,9 +514,11 @@ class ViewArticlePage extends StatelessWidget {
 class ArticleData extends DataTableSource {
   var dataArticle;
   final count;
+  final context;
   ArticleData({
     required this.dataArticle,
     required this.count,
+    required this.context,
   });
   static ReadController readCtrl = Get.find<ReadController>();
 
@@ -500,13 +529,38 @@ class ArticleData extends DataTableSource {
       debugPrint('Article not exist !');
     } else {
       debugPrint('this will invoke a widget to display article[$index]: "$id" !');
+      readCtrl.selectedId.value = id;
     }
+  }
+
+  Future<void> deleteArticle(int index, String id) async {
+    var deleteStatus = await readCtrl.deleteArticle(id);
+    debugPrint("check value success response delete: $deleteStatus}");
+    if(deleteStatus == "Success"){
+      resetAfterArticleUpdate();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("Delete fail"),
+      ));
+    }
+
+  }
+
+  void resetAfterArticleUpdate() {
+    readCtrl.viewUpdateArticleMode.value = false;
+    readCtrl.viewListMode.value = true;
+    readCtrl.gotArticleList.value = false;
+    initReadArticles(readCtrl.selectedViewMode.value.toLowerCase());
+  }
+
+  void initReadArticles(String mode) async {
+    await readCtrl.initArticleList(mode);
   }
 
   @override
   DataRow? getRow(int index) {
     if (index < rowCount) {
-      return recentFileDataRow(dataArticle![index], index, viewArticle);
+      return recentFileDataRow(dataArticle![index], index, viewArticle, deleteArticle);
     } else {
       return null;
     }
@@ -523,13 +577,14 @@ class ArticleData extends DataTableSource {
 }
 
 // DataRow recentFileDataRow(var data) {
-DataRow recentFileDataRow(var data, int index, Function onSelectRow) {
+DataRow recentFileDataRow(var data, int index, Function onSelectRow, Function onDeleteRow) {
   return DataRow.byIndex(
     index: index,
     cells: [
       DataCell(Text(data.title ?? "Title"), onTap: () => onSelectRow(index, data.id)),
       DataCell(Text(data.creator ?? "Literature / News")),
       DataCell(Text(data.tags)),
+      DataCell(const Icon(Icons.delete,color: Colors.black26,),onTap: () => onDeleteRow(index, data.id)),
     ],
   );
 }

@@ -5,6 +5,8 @@ class Strings {
   static const String heyva = "Heyva";
   static const String heyva_capital = "HEYVA";
   static const String login = "Login";
+  static const String forgot_password = "Forgot Password";
+  static const String changeYourPass = "change your pass";
   static const String new_acc_text = "Create New\nAccount";
   static const String continue_email = "Continue with Email";
   static const String continue_google = "Continue with Google";
@@ -146,4 +148,11 @@ class Strings {
   static const String change_password = "Change Password";
   static const String your_new_password = "Your new password";
   static const String confirm_your_password = "Confirm your password";
+
+  static const String deletedAccount = "Delete Account";
+
+  static const String deleteAccountTitl = "Are you sure you want to delete your account?";
+  static const String deleteAccountSub = "Your daily tracker, exercise progress, personal data and others will be erased if you proceed to continue.";
+  static const String cancel = "Cancel";
+
 }

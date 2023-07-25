@@ -18,7 +18,7 @@ enum SideMenuItems {
 List<String> sideMenuItems = const [
   'Dashboard',
   'New Article',
-  'Update Article',
+  // 'Update Article',
   'View Article',
   'Setting',
   'Logout',
@@ -27,7 +27,7 @@ List<String> sideMenuItems = const [
 final _menuPageIcons = <String, String>{
   'Dashboard': 'assets/icons/menu_dashbord.svg',
   'New Article': 'assets/icons/menu_tran.svg',
-  'Update Article': 'assets/icons/menu_task.svg',
+  // 'Update Article': 'assets/icons/menu_task.svg',
   'View Article': 'assets/icons/menu_doc.svg',
   'Setting': 'assets/icons/menu_setting.svg',
   'Logout': 'assets/images/icon_exit.png',

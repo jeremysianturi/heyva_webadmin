@@ -464,7 +464,7 @@ class CreateArticlePage extends GetView<CreateController> {
                       : const Text(''),
                   Expanded(
                     child: createCtrl.gotAttachmentId.value ?
-                      Text('Id: ${createCtrl.attachmentId}')
+                      Text('Id: ${createCtrl.attachmentId.value}')
                       : const Text(""),
                   ),
                 ],
@@ -564,6 +564,9 @@ class CreateArticlePage extends GetView<CreateController> {
               // color: ColorApp.grey_divider,
               child: TextField(
                 onTap: () {
+                  createCtrl.updateReadiness();
+                },
+                onChanged: (text){
                   createCtrl.updateReadiness();
                 },
                 controller: createCtrl.htmlCtrl,

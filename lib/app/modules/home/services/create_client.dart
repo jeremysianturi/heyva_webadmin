@@ -58,6 +58,7 @@ class CreateProvider {
       for(int i=0 ; i < tagsId.length ; i++) {
         formData.fields.add(MapEntry("tag", tagsId[i]));
       }
+      debugPrint("check dulu create : ${formData.fields}");
       formData.fields.add(MapEntry("app_env", mode));
       Response response = await _createClient.post("/api/v1/article/create", data: formData);
       resp = PostArticleModel.fromJson(response.data);
@@ -208,7 +209,7 @@ class CreateController extends GetxController {
           creator: creatorCtrl.value.text,
           body: htmlCtrl.value.text,
           tagsId: selectedTagsId,
-          mode: selectedMode.value
+          mode: selectedMode.value.toLowerCase()
         ))!;
         isPostingArticle = false;
         articleId.value = postArticleResponse.value.data!.id!;
@@ -319,6 +320,7 @@ class CreateController extends GetxController {
     imageFileName = '';
     imageBytes.value = Uint8List(0);
     isSelectedImage = false;
+    updateReadiness();
   }
 
   Future<String?> uploadHtml() async {
@@ -349,7 +351,6 @@ class CreateController extends GetxController {
       titleCtrl.text.isNotEmpty &&
       creatorCtrl.text.isNotEmpty &&
       dateCtrl.text.isNotEmpty &&
-      htmlCtrl.text.isNotEmpty &&
       attachmentId.value.isNotEmpty &&
       titleCtrl.value.text.isNotEmpty &&
       creatorCtrl.value.text.isNotEmpty &&
@@ -357,9 +358,11 @@ class CreateController extends GetxController {
       selectedTagsId.isNotEmpty &&
       htmlCtrl.value.text.isNotEmpty
     ) {
-      isPostingReady.value = true;
+      return isPostingReady.value = true;
+    } else {
+      return isPostingReady.value = false;
     }
-    return isPostingReady.value;
+
   }
 
   clearCreatePage() {

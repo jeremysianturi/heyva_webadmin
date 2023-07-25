@@ -17,14 +17,14 @@ const dashboardPageRoute = "/admin/dashboard";
 const createPageDisplayName = "New Article";
 const createPageRoute = "/admin/create";
 
-const updatePageDisplayName = "Update Article";
-const updatePageRoute = "/admin/update";
+// const updatePageDisplayName = "Update Article";
+// const updatePageRoute = "/admin/update";
 
 const readPageDisplayName = "View Article";
 const readPageRoute = "/admin/read";
 
-const settingPageDisplayName = "Setting";
-const settingPageRoute = "/admin/setting";
+// const settingPageDisplayName = "Setting";
+// const settingPageRoute = "/admin/setting";
 
 const logoutPageDisplayName = "Logout";
 const logoutPageRoute = "/admin/logout";
@@ -43,9 +43,9 @@ NavigationController navigationController = NavigationController.instance;
 List<MenuItem> sideMenuItemRoutes = [
   MenuItem(dashboardPageDisplayName, dashboardPageRoute),
   MenuItem(createPageDisplayName, createPageRoute),
-  MenuItem(updatePageDisplayName, updatePageRoute),
+  // MenuItem(updatePageDisplayName, updatePageRoute),
   MenuItem(readPageDisplayName, readPageRoute),
-  MenuItem(settingPageDisplayName, settingPageRoute),
+  // MenuItem(settingPageDisplayName, settingPageRoute),
   MenuItem(logoutPageDisplayName, logoutPageRoute)
 ];
 
@@ -58,12 +58,12 @@ Route<dynamic> toGenerateRoute(RouteSettings settings){
       return _getPageRoute(DashboardPage(), settings);
     case createPageRoute:
       return _getPageRoute(CreateArticlePage(), settings);
-    case updatePageRoute:
-      return _getPageRoute(UpdateArticlePage(), settings);
+    // case updatePageRoute:
+    //   return _getPageRoute(UpdateArticlePage(), settings);
     case readPageRoute:
       return _getPageRoute(ViewArticlePage(), settings);
-    case settingPageRoute:
-      return _getPageRoute(const SettingPage(), settings);
+    // case settingPageRoute:
+    //   return _getPageRoute(const SettingPage(), settings);
     case logoutPageRoute:
       return _getPageRoute(ExitPage(), settings);
     default:

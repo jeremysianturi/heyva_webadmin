@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+
 import '../../../../constant/keys.dart';
 import '../../../../services/dio_services.dart';
 import '../models/termsofservice_model.dart';
@@ -42,7 +43,7 @@ class TermsOfServiceController extends GetxController {
 
       if (termsOfServiceResponse.value.success == "Success") {
         var data = termsOfServiceResponse.value.data;
-        debugPrint("check value terms of service: ${termsOfServiceResponse.value.data}");
+        // debugPrint("check value terms of service: ${termsOfServiceResponse.value.data}");
         box.write(Keys.termsOfServiceText, data?.textContent);
       } else {
         errorMessage.value = termsOfServiceResponse.value.message ?? "Error Message";

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+
 import '../../../../constant/colors.dart';
 import '../../../../constant/strings.dart';
 import '../../../widgets/reusable_orange_button_with_trailing_icon.dart';
@@ -8,11 +9,15 @@ import '../controllers/resetpassword_controller.dart';
 
 class ResetPasswordView extends GetView<ResetPasswordController> {
   ResetPasswordView({super.key});
+
   final resetPasswordController = Get.put(ResetPasswordController());
-  final _formKey = GlobalKey<FormState>();
+  // final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    debugPrint(
+        "requset reset token  ${Get.parameters['request_reset_password_token']}");
+
     return Scaffold(
       body: Container(
         height: double.maxFinite,
@@ -33,24 +38,30 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                 SvgPicture.asset("assets/images/heyva_logo.svg"),
                 const Text(
                   Strings.tagline_splash,
-                  style: TextStyle(color: ColorApp.black_font_underline, fontWeight: FontWeight.w400, fontSize: 14),
+                  style: TextStyle(
+                      color: ColorApp.black_font_underline,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 14),
                 ),
               ],
             ),
             const Text(
               Strings.change_your_password,
-              style: TextStyle(color: ColorApp.black_article_title, fontWeight: FontWeight.w500, fontSize: 20),
+              style: TextStyle(
+                  color: ColorApp.black_article_title,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 42.5),
-              child: Form(
-                key: _formKey,
-                child: Column(
+            Row(
+              children: [
+                Expanded(flex: 1, child: Container()),
+                Expanded(flex: 1, child: Column(
                   children: [
                     Obx(
-                      () => TextField(
+                          () => TextField(
                         controller: resetPasswordController.passC,
-                        obscureText: resetPasswordController.isObscure.value,
+                        obscureText:
+                        resetPasswordController.isObsecurePass.value,
                         decoration: InputDecoration(
                             hintText: Strings.your_new_password,
                             contentPadding: const EdgeInsets.symmetric(
@@ -76,14 +87,15 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                               ),
                             ),
                             errorText:
-                                resetPasswordController.isPasserror.isTrue
-                                    ? "error"
-                                    : null,
+                            resetPasswordController.isPassError.isTrue
+                                ? "error"
+                                : null,
                             errorStyle: const TextStyle(fontSize: 0.01),
                             suffixIcon: InkWell(
                               onTap: () {
-                                resetPasswordController.isObscure.value =
-                                    !resetPasswordController.isObscure.value;
+                                resetPasswordController.isObsecurePass.value =
+                                !resetPasswordController
+                                    .isObsecurePass.value;
                               },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -91,7 +103,8 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                                   Padding(
                                     padding: const EdgeInsets.only(right: 20.0),
                                     child: Text(
-                                      resetPasswordController.isObscure.isTrue
+                                      resetPasswordController
+                                          .isObsecurePass.isTrue
                                           ? "Show"
                                           : "Hide",
                                       style: const TextStyle(
@@ -109,9 +122,10 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                       height: 12,
                     ),
                     Obx(
-                      () => TextField(
-                        controller: resetPasswordController.passC,
-                        obscureText: resetPasswordController.isObscure.value,
+                          () => TextField(
+                        controller: resetPasswordController.confPassC,
+                        obscureText:
+                        resetPasswordController.isObsecureConfPass.value,
                         decoration: InputDecoration(
                             hintText: Strings.confirm_your_password,
                             contentPadding: const EdgeInsets.symmetric(
@@ -137,14 +151,16 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                               ),
                             ),
                             errorText:
-                                resetPasswordController.isPasserror.isTrue
-                                    ? "error"
-                                    : null,
+                            resetPasswordController.isConfPasError.isTrue
+                                ? "error"
+                                : null,
                             errorStyle: const TextStyle(fontSize: 0.01),
                             suffixIcon: InkWell(
                               onTap: () {
-                                resetPasswordController.isObscure.value =
-                                    !resetPasswordController.isObscure.value;
+                                resetPasswordController
+                                    .isObsecureConfPass.value =
+                                !resetPasswordController
+                                    .isObsecureConfPass.value;
                               },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -152,7 +168,8 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                                   Padding(
                                     padding: const EdgeInsets.only(right: 20.0),
                                     child: Text(
-                                      resetPasswordController.isObscure.isTrue
+                                      resetPasswordController
+                                          .isObsecureConfPass.isTrue
                                           ? "Show"
                                           : "Hide",
                                       style: const TextStyle(
@@ -168,7 +185,7 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                     ),
                     if (resetPasswordController.errorMessage.value.isNotEmpty)
                       Container(
-                        margin: const EdgeInsets.only(top: 8),
+                        margin: EdgeInsets.only(top: 8),
                         width: Get.width,
                         child: Text(
                           resetPasswordController.errorMessage.value,
@@ -180,12 +197,16 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                         ),
                       )
                   ],
-                ),
-              ),
+                ),),
+                Expanded(flex: 1, child: Container()),
+              ],
             ),
-            OrangeButtonWTrailingIcon(text: Strings.change_password,onTap: (){
-
-            },),
+            OrangeButtonWTrailingIcon(
+              text: Strings.change_password,
+              onTap: () {
+                controller.resetPassword();
+              },
+            ),
           ],
         ),
       ),

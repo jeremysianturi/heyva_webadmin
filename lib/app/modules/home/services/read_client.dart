@@ -2,7 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' as milliseconds;
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:heyva_web_admin/services/dio_services.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import '../../login/controllers/login_controller.dart';
 import '../model/read_article_data.dart';
@@ -19,7 +21,7 @@ class ReadProvider {
 
     try {
       Map<String, dynamic> queryPars;
-      if(mode == 'Development') {
+      if(mode == 'development') {
         queryPars = {
           'search': '',
           'page': page.toString(),
@@ -76,6 +78,66 @@ class ReadProvider {
 
     return resp;
   }
+
+  Future<UpdateArticleModel?> updateExistingArticle({
+    required String artId,
+    required String title,
+    required String body,
+    required String creator,
+    required String? banner,
+    required String? thumbnail,
+    required List<String?> tagsId,
+    // required String mode,
+  }) async {
+    UpdateArticleModel? resp;
+
+    try {
+      FormData formData = FormData.fromMap({
+        "title": title,
+        "body": body,
+        "creator": creator,
+        "banner": banner,
+        "thumbnail": thumbnail,
+      });
+      for(int i=0 ; i < tagsId.length ; i++) {
+        formData.fields.add(MapEntry("tag", tagsId[i]!));
+      }
+      debugPrint("check dulu : ${formData.fields}");
+      // formData.fields.add(MapEntry("app_env", mode));
+      Response response = await _readClient.put("/api/v1/article/update/$artId", data: formData);
+      resp = UpdateArticleModel.fromJson(response.data);
+
+    } on DioError catch (err) {
+      debugPrint('Update fail with result: ${err.response}');
+      var message = err.response?.data['message'];
+      var error = err.response?.data['error'];
+      // in case of message of error is 'Expired Signature' then will retry postNewAttachment() after refresh the authToken
+      resp = UpdateArticleModel(success: "", data: null, message: message, error: error);
+    }
+
+    return resp;
+  }
+
+  Future<DeleteArticleModel?> deleteExistingArticle({
+    required String artId,
+    // required String mode,
+  }) async {
+    DeleteArticleModel? resp;
+
+    try {
+      Response response = await _readClient.delete("/api/v1/article/delete/$artId");
+      resp = DeleteArticleModel.fromJson(response.data);
+
+    } on DioError catch (err) {
+      debugPrint('Delete fail with result: ${err.response}');
+      var message = err.response?.data['message'];
+      var error = err.response?.data['error'];
+      // in case of message of error is 'Expired Signature' then will retry postNewAttachment() after refresh the authToken
+      resp = DeleteArticleModel(success: "", data: null, message: message, error: error);
+    }
+
+    return resp;
+  }
 }
 
 class ReadController extends GetxController {
@@ -95,6 +157,7 @@ class ReadController extends GetxController {
   final TextEditingController creatorCtrl = TextEditingController();
   final TextEditingController htmlCtrl = TextEditingController();
   final TextEditingController tagCtrl = TextEditingController();
+  final TextEditingController dateCtrl = TextEditingController();
 
   var viewListMode = true.obs;
   var viewUpdateArticleMode = false.obs;
@@ -117,10 +180,17 @@ class ReadController extends GetxController {
   var selectedTags = <TagIdName?>[].obs;
   var items = <MultiSelectItem<TagIdName>>[].obs;
   var itemsSelected = <MultiSelectItem<TagIdName>>[].obs;
-  List<String> selectedTagsId = [];
+  List<String?> selectedTagsId = [""];
   var gotTagsList = false.obs;
   // var firstTransaction = true.obs;
   List<TagIdName> initialArticleTags = [];
+  var selectedId = "".obs;
+  var isUpdatingArticle = false;
+  var attachmentId = ''.obs;
+  var articleId = '';
+  var gotUpdatingId = false.obs;
+  var isUpdatingReady = false.obs;
+
 
   var getArticleListResponse =
       GetArticleList(success: "", data: null, message: "", error: "", links: null, count: null).obs;
@@ -162,7 +232,9 @@ class ReadController extends GetxController {
 
     do {
       try {
+        debugPrint("check value mode: $mode");
         getArticleListResponse.value = (await _read.getArticleList(page, mode))!;
+        debugPrint("check value getArticleListResponse: ${getArticleListResponse.value}");
         fullArticlesList?.addAll(getArticleListResponse.value.data as Iterable<GetArticleData>);
         if(gotArticles == 0) {
           nbrOfArticles = getArticleListResponse.value.count!;
@@ -172,7 +244,7 @@ class ReadController extends GetxController {
         }
       } catch (err) {
         isGettingArticles.value = false;
-        debugPrint("error  $err");
+        debugPrint("error#1  $err");
         // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
         if(getArticleListResponse.value.message == 'Expired Signature') {
           accessCtrl.tokenRefresh();
@@ -190,7 +262,7 @@ class ReadController extends GetxController {
             gotArticleList.value = true;
           } catch (err) {
             isGettingArticles.value = false;
-            debugPrint("error  $err");
+            debugPrint("error#2  $err");
           }
         }
         if(gotArticles > 0) {
@@ -239,7 +311,7 @@ class ReadController extends GetxController {
       return tagIdNames;
     } catch (err) {
       isGettingTags = false;
-      debugPrint("error  $err");
+      debugPrint("error#3  $err");
       // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
       if(getTagsResponse.value.message == 'Expired Signature') {
         accessCtrl.tokenRefresh();
@@ -254,7 +326,7 @@ class ReadController extends GetxController {
           return tagIdNames;
         } catch (err) {
           isGettingTags = false;
-          debugPrint("error  $err");
+          debugPrint("error#4  $err");
         }
       }
       return null;
@@ -276,7 +348,7 @@ class ReadController extends GetxController {
   clearFilter() {
     filterCtrl.clear();
     displayArticleList.value = cachedArticleList.value
-        .where((element) => element.title!.contains(''))
+        .where((element) => element.title.toLowerCase().contains(''))
         .toList();
     sortColumnIndex.value = sortColumnIndex.value;
     sort.value = false;
@@ -284,7 +356,7 @@ class ReadController extends GetxController {
 
   filterArticleTable(String value) {
     displayArticleList.value = cachedArticleList.value
-        .where((element) => element.title!.contains(value))
+        .where((element) => element.title.toLowerCase().contains(value))
         .toList();
   }
 
@@ -295,6 +367,7 @@ class ReadController extends GetxController {
     for(var i=0 ; i < fullArticlesList!.length ; i++) {
       if(fullArticlesList?[i].id == id) {
         selectedArticle = fullArticlesList![i];
+        articleId = selectedArticle.id!;
         titleCtrl.text = selectedArticle.title!;
         tagCtrl.text = listArticleTags(selectedArticle.tags?.map((x) => x.tag?.name).toList() as List<String?>);
         // initialize selected tags in multiselect chip
@@ -327,6 +400,16 @@ class ReadController extends GetxController {
     viewListMode.value = false;
     selectedArticleMode.value = selectedViewMode.value;
   }
+
+  List<String?> getTagStringList(){
+    return selectedArticle.tags?.map((x) => x.tag?.name).toList() as List<String?>;
+  }
+
+  List<String?> getInitialTagIdList(){
+    return selectedArticle.tags?.map((x) => x.tag?.id).toList() as List<String?>;
+  }
+
+
   updateSelectedTagsId() {
     itemsSelected.value = selectedTags.value.map(
             (tag) => MultiSelectItem<TagIdName>(tag!, tag.name)
@@ -343,4 +426,128 @@ class ReadController extends GetxController {
       (tag.label.contains(labels[i]))).map((e) => e.selected = true).toList();
     }
   }
+
+  var updateArticleResponse =
+      UpdateArticleModel(success: "", data: null, message: "", error: "").obs;
+
+  Future<String> updateArticle(List<String?> id) async {
+
+    // if (id == attachmentId.value) {
+      errorPostMessage.value = '';
+      isUpdatingArticle = true;
+      try {
+        debugPrint("check dulu ya: $selectedTagsId");
+        updateArticleResponse.value = (await _read.updateExistingArticle(
+          artId: articleId,
+          title: titleCtrl.value.text,
+          body: htmlCtrl.value.text,
+          creator: creatorCtrl.value.text,
+          banner: selectedArticle.banner,
+          thumbnail: selectedArticle.thumbnail,
+          tagsId: id,
+            // mode: selectedMode.value
+        ))!;
+        isUpdatingArticle = false;
+        articleId = updateArticleResponse.value.data!.id!;
+        if(articleId.isNotEmpty) {
+          gotUpdatingId.value = true;
+          updateReadiness();
+        }
+        return articleId;
+      } catch (err) {
+        isUpdatingArticle = false;
+        debugPrint("update error: $err");
+        // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
+        if(updateArticleResponse.value.message == 'Expired Signature') {
+          accessCtrl.tokenRefresh();
+          _client.refreshOption();
+          try {
+            updateArticleResponse.value = (await _read.updateExistingArticle(
+              artId: articleId,
+              title: titleCtrl.value.text,
+              body: htmlCtrl.value.text,
+              creator: creatorCtrl.value.text,
+              banner: selectedArticle.banner,
+              thumbnail: selectedArticle.thumbnail,
+              tagsId: id,
+                // mode: selectedMode.value.toLowerCase()
+            ))!;
+            isUpdatingArticle = false;
+            articleId = updateArticleResponse.value.data!.id!;
+            if(articleId.isNotEmpty) {
+              gotUpdatingId.value = true;
+              updateReadiness();
+            }
+            return articleId;
+          } catch (err) {
+            isUpdatingArticle = false;
+            debugPrint("error#4  $err");
+          }
+        }
+        return '';
+      }
+    // } else {
+    //   debugPrint('Article invalid !');
+    //   return '';
+    // }
+  }
+
+  bool updateReadiness() {
+
+    if(
+    titleCtrl.text.isNotEmpty &&
+        creatorCtrl.text.isNotEmpty &&
+        dateCtrl.text.isNotEmpty &&
+        htmlCtrl.text.isNotEmpty &&
+        attachmentId.value.isNotEmpty &&
+        titleCtrl.value.text.isNotEmpty &&
+        creatorCtrl.value.text.isNotEmpty &&
+        dateCtrl.value.text.isNotEmpty &&
+        selectedTagsId.isNotEmpty &&
+        htmlCtrl.value.text.isNotEmpty
+    ) {
+      isUpdatingReady.value = true;
+    }
+    return isUpdatingReady.value;
+  }
+
+  var deleteArticleResponse =
+      DeleteArticleModel(success: "", data: null, message: "", error: "").obs;
+
+  Future<String> deleteArticle(String? id) async {
+
+    // if (id == attachmentId.value) {
+    try {
+      debugPrint("check value delete id: $id");
+      deleteArticleResponse.value = (await _read.deleteExistingArticle(
+        artId: id!,
+      ))!;
+      debugPrint("check 1111 : ${deleteArticleResponse.value.success!}");
+      return deleteArticleResponse.value.success!;
+    } catch (err) {
+      debugPrint("update error: $err");
+      // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
+      if(updateArticleResponse.value.message == 'Expired Signature') {
+        accessCtrl.tokenRefresh();
+        _client.refreshOption();
+        try {
+          deleteArticleResponse.value = (await _read.deleteExistingArticle(
+            artId: id!,
+          ))!;
+
+          return id;
+        } catch (err) {
+          isUpdatingArticle = false;
+          debugPrint("error#4  $err");
+        }
+      }
+      return '';
+    }
+    // } else {
+    //   debugPrint('Article invalid !');
+    //   return '';
+    // }
+  }
+
+
 }

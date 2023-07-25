@@ -1,4 +1,5 @@
 
+import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 class GetArticleList {
@@ -90,8 +91,8 @@ class GetChainLinks {
   late String? previous;  // article title
 
   GetChainLinks.fromJson(Map<String, dynamic> json) {
-    next = json['next'];
-    previous = json['previous'];
+      next = json['next'];
+      previous = json['previous'];
   }
 
   Map<String, dynamic> toJson() {
@@ -261,4 +262,90 @@ class TagIdName {
   String id;
   String name;
   TagIdName({required this.id, required this.name});
+}
+
+class UpdateArticleModel {
+  UpdateArticleModel({
+    required this.success, required this.data, required this.message, required this.error
+  });
+  late final String? success;
+  late final UpdateArticleData? data;
+  late final String? message;
+  late final String? error;
+
+  UpdateArticleModel.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    data = UpdateArticleData.fromJson(json['data']);
+    message = json['message'];
+    error = json['error'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+
+    _data['success'] = success;
+    _data['data'] = data?.toJson();
+    _data['message'] = message;
+    _data['error'] = error;
+    return _data;
+  }
+}
+
+class UpdateArticleData {
+  UpdateArticleData({required this.id});
+
+  late final String? id;
+
+  UpdateArticleData.fromJson(json) {
+    id = json['id'];
+  }
+
+  toJson() {
+    final data = {};
+    data['id'] = id!;
+    return data;
+  }
+}
+
+class DeleteArticleModel {
+  DeleteArticleModel({
+    required this.success, required this.data, required this.message, required this.error
+  });
+  late final String? success;
+  late final DeleteArticleData? data;
+  late final String? message;
+  late final String? error;
+
+  DeleteArticleModel.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    data = DeleteArticleData.fromJson(json['data']);
+    message = json['message'];
+    error = json['error'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+
+    _data['success'] = success;
+    _data['data'] = data?.toJson();
+    _data['message'] = message;
+    _data['error'] = error;
+    return _data;
+  }
+}
+
+class DeleteArticleData {
+  DeleteArticleData({required this.id});
+
+  late final String? id;
+
+  DeleteArticleData.fromJson(json) {
+    id = json['id'];
+  }
+
+  toJson() {
+    final data = {};
+    data['id'] = id!;
+    return data;
+  }
 }
