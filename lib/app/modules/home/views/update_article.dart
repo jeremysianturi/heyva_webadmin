@@ -18,7 +18,7 @@ class UpdateArticlePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    String pageName = sideMenuItems[SideMenuItems.updateArticle.index];
+    // String pageName = sideMenuItems[SideMenuItems.updateArticle.index];
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -27,7 +27,7 @@ class UpdateArticlePage extends StatelessWidget {
             Row(
               children: <Widget>[
                 Text(
-                  pageName,
+                  "pageName",
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 const Spacer(),

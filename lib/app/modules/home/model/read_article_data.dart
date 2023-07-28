@@ -84,6 +84,7 @@ class GetArticleData {
     return _data;
   }
 }
+
 class GetChainLinks {
   GetChainLinks({required this.next, required this.previous});
 
@@ -173,6 +174,7 @@ class ArticleListTable {
 
   ArticleListTable({required this.id, required this.title, this.creator, required this.tags/*, required this.htmlBody*/});
 }
+
 @JsonSerializable()
 class TagsArticleModel{
 

@@ -1,10 +1,11 @@
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' as milliseconds;
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-import 'package:heyva_web_admin/services/dio_services.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import '../../login/controllers/login_controller.dart';
 import '../model/read_article_data.dart';
@@ -190,24 +191,24 @@ class ReadController extends GetxController {
   var articleId = '';
   var gotUpdatingId = false.obs;
   var isUpdatingReady = false.obs;
+  var totalArticleProd = 0.obs;
+  var totalArticleDev = 0.obs;
+  var totalArticle = 0.obs;
 
-
-  var getArticleListResponse =
-      GetArticleList(success: "", data: null, message: "", error: "", links: null, count: null).obs;
 
   onSortColumn(int columnIndex, bool ascending) {
     if (columnIndex == 0) {
       if (ascending) {
-        displayArticleList.value.sort((a, b) => a.title!.compareTo(b.title!));
+        displayArticleList.value.sort((a, b) => a.title.compareTo(b.title));
       } else {
-        displayArticleList.value.sort((a, b) => b.title!.compareTo(a.title!));
+        displayArticleList.value.sort((a, b) => b.title.compareTo(a.title));
       }
     }
     if (columnIndex == 1) {
       if (ascending) {
-        displayArticleList.value.sort((a, b) => a.creator!.compareTo(b.title!));
+        displayArticleList.value.sort((a, b) => a.creator!.compareTo(b.title));
       } else {
-        displayArticleList.value.sort((a, b) => b.creator!.compareTo(a.title!));
+        displayArticleList.value.sort((a, b) => b.creator!.compareTo(a.title));
       }
     }
     // if (columnIndex == 2) {
@@ -220,6 +221,9 @@ class ReadController extends GetxController {
     sortColumnIndex = sortColumnIndex;
     sort = sort;
   }
+
+  var getArticleListResponse =
+      GetArticleList(success: "", data: null, message: "", error: "", links: null, count: null).obs;
 
   Future<List<GetArticleData>?> initArticleList(String mode) async {
 
@@ -290,6 +294,39 @@ class ReadController extends GetxController {
     gotArticleList.value = true;
     isGettingArticles.value = false;
     return fullArticlesList;
+  }
+
+  Future<int> getArticleTotal() async {
+
+    int page = 1;
+
+      try {
+        getArticleListResponse.value = (await _read.getArticleList(page, "development"))!;
+        if(totalArticleDev.value == 0){
+          totalArticleDev.value = getArticleListResponse.value.count!;
+        }
+      } catch (err) {
+        isGettingArticles.value = false;
+        debugPrint("error#10 $err");
+      }
+
+    try {
+      getArticleListResponse.value = (await _read.getArticleList(page, "production"))!;
+      if(totalArticleProd.value == 0){
+        totalArticleProd.value += getArticleListResponse.value.count!;
+      }
+    } catch (err) {
+      isGettingArticles.value = false;
+      debugPrint("error#11 $err");
+    }
+
+    if(totalArticle.value == 0) {
+      totalArticle.value = totalArticleDev.value + totalArticleProd.value;
+    }
+
+    debugPrint("check value totalArticle ${totalArticle}");
+
+    return totalArticleProd.value;
   }
 
 /***********************************************************************************************/

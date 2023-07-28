@@ -9,9 +9,8 @@ import 'admin_routes.dart';
 enum SideMenuItems {
   dashboard,
   newArticle,
-  updateArticle,
   viewArticle,
-  setting,
+  user,
   logout
 }
 
@@ -20,7 +19,7 @@ List<String> sideMenuItems = const [
   'New Article',
   // 'Update Article',
   'View Article',
-  'Setting',
+  'User',
   'Logout',
 ];
 
@@ -29,7 +28,7 @@ final _menuPageIcons = <String, String>{
   'New Article': 'assets/icons/menu_tran.svg',
   // 'Update Article': 'assets/icons/menu_task.svg',
   'View Article': 'assets/icons/menu_doc.svg',
-  'Setting': 'assets/icons/menu_setting.svg',
+  'User': 'assets/icons/menu_setting.svg',
   'Logout': 'assets/images/icon_exit.png',
 };
 

@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 
 import '../../../controllers/auth_controller.dart';
 
-class SettingPage extends StatelessWidget {
-  const SettingPage({Key? key}) : super(key: key);
+class UserView extends StatelessWidget {
+  const UserView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

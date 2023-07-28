@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../views/dashboard_view.dart';
-import '../views/dummy_pages.dart';
+import '../views/user_view.dart';
 import '../views/post_article.dart';
 import '../views/read_article.dart';
 import '../views/update_article.dart';
@@ -23,8 +23,8 @@ const createPageRoute = "/admin/create";
 const readPageDisplayName = "View Article";
 const readPageRoute = "/admin/read";
 
-// const settingPageDisplayName = "Setting";
-// const settingPageRoute = "/admin/setting";
+const userPageDisplayName = "User";
+const userPageRoute = "/admin/user";
 
 const logoutPageDisplayName = "Logout";
 const logoutPageRoute = "/admin/logout";
@@ -45,7 +45,7 @@ List<MenuItem> sideMenuItemRoutes = [
   MenuItem(createPageDisplayName, createPageRoute),
   // MenuItem(updatePageDisplayName, updatePageRoute),
   MenuItem(readPageDisplayName, readPageRoute),
-  // MenuItem(settingPageDisplayName, settingPageRoute),
+  MenuItem(userPageDisplayName, userPageRoute),
   MenuItem(logoutPageDisplayName, logoutPageRoute)
 ];
 
@@ -62,8 +62,8 @@ Route<dynamic> toGenerateRoute(RouteSettings settings){
     //   return _getPageRoute(UpdateArticlePage(), settings);
     case readPageRoute:
       return _getPageRoute(ViewArticlePage(), settings);
-    // case settingPageRoute:
-    //   return _getPageRoute(const SettingPage(), settings);
+    case userPageRoute:
+      return _getPageRoute(const UserView(), settings);
     case logoutPageRoute:
       return _getPageRoute(ExitPage(), settings);
     default:

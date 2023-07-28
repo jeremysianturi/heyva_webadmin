@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../controllers/menu_controller.dart';
 import '../controllers/navigation_controllers.dart';
 import '../services/create_client.dart';
+import '../services/dashboard_client.dart';
 import '../services/read_client.dart';
 
 
@@ -14,6 +15,7 @@ class AdminLayout extends StatelessWidget {
   // final createCtrl = Get.put(CreateController(), permanent: true);
   final instanceCreate = Get.lazyPut(() => CreateController());
   final instanceRead = Get.lazyPut(() => ReadController());
+  final instanceUserRead = Get.lazyPut(() => ReadUserController());
 
   @override
   Widget build(BuildContext context) {
