@@ -52,6 +52,7 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                   fontWeight: FontWeight.w500,
                   fontSize: 20),
             ),
+<<<<<<< HEAD
             Row(
               children: [
                 Expanded(flex: 1, child: Container()),
@@ -142,14 +143,105 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                                 fontWeight: FontWeight.w400),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
+=======
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 42.5),
+              child: Column(
+                children: [
+                  Obx(
+                    () => TextField(
+                      controller: resetPasswordController.passC,
+                      obscureText:
+                          resetPasswordController.isObsecurePass.value,
+                      decoration: InputDecoration(
+                          hintText: Strings.your_new_password,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 17, horizontal: 20),
+                          filled: true,
+                          fillColor: ColorApp.text_input_bg,
+                          hintStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: ColorApp.grey_font),
+                          labelStyle: const TextStyle(
+                              fontSize: 16,
+                              color: ColorApp.black_font_underline,
+                              fontWeight: FontWeight.w400),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: ColorApp.red_error,
+                              width: 2.0,
                             ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              borderSide: const BorderSide(
-                                color: ColorApp.red_error,
-                                width: 2.0,
-                              ),
+                          ),
+                          errorText:
+                              resetPasswordController.isPassError.isTrue
+                                  ? "error"
+                                  : null,
+                          errorStyle: const TextStyle(fontSize: 0.01),
+                          suffixIcon: InkWell(
+                            onTap: () {
+                              resetPasswordController.isObsecurePass.value =
+                                  !resetPasswordController
+                                      .isObsecurePass.value;
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 20.0),
+                                  child: Text(
+                                    resetPasswordController
+                                            .isObsecurePass.isTrue
+                                        ? "Show"
+                                        : "Hide",
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: ColorApp.black_font_50),
+                                  ),
+                                ),
+                              ],
+>>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
                             ),
+                          )),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  Obx(
+                    () => TextField(
+                      controller: resetPasswordController.confPassC,
+                      obscureText:
+                          resetPasswordController.isObsecureConfPass.value,
+                      decoration: InputDecoration(
+                          hintText: Strings.confirm_your_password,
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 17, horizontal: 20),
+                          filled: true,
+                          fillColor: ColorApp.text_input_bg,
+                          hintStyle: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: ColorApp.grey_font),
+                          labelStyle: const TextStyle(
+                              fontSize: 16,
+                              color: ColorApp.black_font_underline,
+                              fontWeight: FontWeight.w400),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(
+                              color: ColorApp.red_error,
+                              width: 2.0,
+                            ),
+<<<<<<< HEAD
                             errorText:
                             resetPasswordController.isConfPasError.isTrue
                                 ? "error"
@@ -177,12 +269,42 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                                           fontWeight: FontWeight.w600,
                                           color: ColorApp.black_font_50),
                                     ),
+=======
+                          ),
+                          errorText:
+                              resetPasswordController.isConfPasError.isTrue
+                                  ? "error"
+                                  : null,
+                          errorStyle: const TextStyle(fontSize: 0.01),
+                          suffixIcon: InkWell(
+                            onTap: () {
+                              resetPasswordController
+                                      .isObsecureConfPass.value =
+                                  !resetPasswordController
+                                      .isObsecureConfPass.value;
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 20.0),
+                                  child: Text(
+                                    resetPasswordController
+                                            .isObsecureConfPass.isTrue
+                                        ? "Show"
+                                        : "Hide",
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: ColorApp.black_font_50),
+>>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
                                   ),
-                                ],
-                              ),
-                            )),
-                      ),
+                                ),
+                              ],
+                            ),
+                          )),
                     ),
+<<<<<<< HEAD
                     if (resetPasswordController.errorMessage.value.isNotEmpty)
                       Container(
                         margin: EdgeInsets.only(top: 8),
@@ -207,6 +329,31 @@ class ResetPasswordView extends GetView<ResetPasswordController> {
                 controller.resetPassword();
               },
             ),
+=======
+                  ),
+                  if (resetPasswordController.errorMessage.value.isNotEmpty)
+                    Container(
+                      margin: EdgeInsets.only(top: 8),
+                      width: Get.width,
+                      child: Text(
+                        resetPasswordController.errorMessage.value,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: ColorApp.red_error),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                ],
+              ),
+            ),
+            OrangeButtonWTrailingIcon(
+              text: Strings.change_password,
+              onTap: () {
+                controller.resetPassword();
+              },
+            ),
+>>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
           ],
         ),
       ),

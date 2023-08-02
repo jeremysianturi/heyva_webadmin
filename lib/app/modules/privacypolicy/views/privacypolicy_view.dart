@@ -20,6 +20,7 @@ class PrivacyPolicyView extends GetView<PrivacyPolicyController> {
               fit: BoxFit.fill,
             ),
           ),
+<<<<<<< HEAD
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: CustomScrollView(
@@ -39,6 +40,33 @@ class PrivacyPolicyView extends GetView<PrivacyPolicyController> {
               ],
             ),
           )
+=======
+          child: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  children: <Widget>[
+                    Expanded(
+                      // child: Html(
+                      //   data: """${termsController.termsOfServiceText}""",
+                      // ),
+                      child: Text(
+                        _parseHtmlString(privacyController.privacyPolicyText)!,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
+        // Column(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     Text(termsController.termsOfServiceText)
+        //   ],
+        // ),
+>>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
       ),
     );
   }
