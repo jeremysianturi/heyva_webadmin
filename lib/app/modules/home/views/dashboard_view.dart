@@ -27,10 +27,9 @@ class DashboardPage extends StatelessWidget {
     await readArticleCtrl.getArticleTotal();
   }
 
-  void goSeeArticlePage() {
-    adminMenuCtrl.changeActiveItemTo(readPageDisplayName);
-    navigationController.navigateTo(sideMenuItemRoutes.firstWhere((e) =>
-    e.name == readPageDisplayName).route);
+  void goSeeAnotherPage(String itemName) {
+    adminMenuCtrl.changeActiveItemTo(itemName);
+    navigationController.navigateTo(sideMenuItemRoutes.firstWhere((e) => e.name == itemName).route);
   }
 
   @override
@@ -39,10 +38,12 @@ class DashboardPage extends StatelessWidget {
     String pageName = sideMenuItems[SideMenuItems.dashboard.index];
 
     if(readUserCtrl.cachedUserList.isEmpty) {
+      debugPrint("ini masalahnya3");
       initReadUsers();
     }
 
     if(readArticleCtrl.totalArticleProd.value == 0) {
+      debugPrint("ini masalahnya5");
       initTotalArticle();
     }
 
@@ -84,7 +85,7 @@ class DashboardPage extends StatelessWidget {
                         children: [
                           ElevatedButton(
                             onPressed: () => {
-                              goSeeArticlePage()
+                              goSeeAnotherPage(readPageDisplayName)
                             },
                             style: ButtonStyle(
                               backgroundColor:
@@ -138,7 +139,9 @@ class DashboardPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ElevatedButton(
-                            onPressed: () => 'Null',
+                            onPressed: () => {
+                              goSeeAnotherPage(userPageDisplayName)
+                            },
                             style: ButtonStyle(
                               backgroundColor:
                               MaterialStateProperty.all(ColorApp.btn_pink),

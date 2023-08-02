@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../views/dashboard_view.dart';
+import '../views/logout_view.dart';
 import '../views/user_view.dart';
 import '../views/post_article.dart';
 import '../views/read_article.dart';
@@ -50,10 +51,10 @@ List<MenuItem> sideMenuItemRoutes = [
 ];
 
 
-Route<dynamic> toGenerateRoute(RouteSettings settings){
+Route<dynamic>? toGenerateRoute(RouteSettings settings){
   switch (settings.name) {
     case adminPageRoute:
-      return _getPageRoute(DashboardPage(), settings);
+      return _getPageRoute(ExitPage(), settings);
     case dashboardPageRoute:
       return _getPageRoute(DashboardPage(), settings);
     case createPageRoute:
@@ -63,13 +64,14 @@ Route<dynamic> toGenerateRoute(RouteSettings settings){
     case readPageRoute:
       return _getPageRoute(ViewArticlePage(), settings);
     case userPageRoute:
-      return _getPageRoute(const UserView(), settings);
+      return _getPageRoute(UserView(), settings);
     case logoutPageRoute:
       return _getPageRoute(ExitPage(), settings);
-    default:
-      return _getPageRoute(DashboardPage(), settings);
+    // default:
+    //   return _getPageRoute(DashboardPage(), settings);
 
   }
+  return null;
 }
 
 // PageRoute _getPageRoute(Widget child, RouteSettings settings){

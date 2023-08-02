@@ -234,11 +234,13 @@ class ReadController extends GetxController {
     nbrOfArticles = 0;
     int page = 1;
 
+    debugPrint("ini masalahnya2");
+
     do {
       try {
         debugPrint("check value mode: $mode");
         getArticleListResponse.value = (await _read.getArticleList(page, mode))!;
-        debugPrint("check value getArticleListResponse: ${getArticleListResponse.value}");
+        debugPrint("check value getArticleListResponse: ${getArticleListResponse.value.data?.length}");
         fullArticlesList?.addAll(getArticleListResponse.value.data as Iterable<GetArticleData>);
         if(gotArticles == 0) {
           nbrOfArticles = getArticleListResponse.value.count!;

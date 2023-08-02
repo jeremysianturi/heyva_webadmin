@@ -64,13 +64,13 @@ class GetUserData {
 
   GetUserData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    username = json['username'];
-    email = json['email'];
-    phoneNumber = json['phone_number'];
-    isVerified = json['is_verified'];
-    lastLogin = json['last_login'];
+    username = json['username'] ?? "No Username";
+    email = json['email'] ?? "No Email Registered";
+    phoneNumber = json['phone_number'] ?? "No Phone Number";
+    isVerified = json['is_verified'] ?? "No data";
+    lastLogin = json['last_login'] ?? "-";
     profile = ProfileData.fromJson(json['profile']);
-    avatar = json['avatar'];
+    avatar = json['avatar'] ?? "No Avatar";
   }
 
   Map<String, dynamic> toJson() {
@@ -120,8 +120,9 @@ class UserListTable {
   String id;
   String username;
   String email;
+  String phoneNumber;
   String avatar;
   String lastLogin;
 
-  UserListTable({required this.id, required this.username, required this.email, required this.avatar, required this.lastLogin});
+  UserListTable({required this.id, required this.username, required this.email, required this.phoneNumber, required this.avatar, required this.lastLogin});
 }

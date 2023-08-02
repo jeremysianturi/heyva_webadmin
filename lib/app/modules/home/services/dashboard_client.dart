@@ -18,8 +18,15 @@ class ReadUserProvider {
     int size = 10;
 
     try {
+      Map<String, dynamic> queryPars;
+        queryPars = {
+          'search': '',
+          'page': page.toString(),
+          'page_size': size.toString()
+        };
       Response response = await _readUserClient.get(
           "/api/v1/users/get-list",
+          queryParameters: queryPars
       );
       resp = GetUserList.fromJson(response.data);
 
@@ -59,6 +66,32 @@ class ReadUserController extends GetxController {
   var sortColumnIndex = 0.obs;
   var sort = false.obs;
 
+  onSortColumn(int columnIndex, bool ascending) {
+    if (columnIndex == 0) {
+      if (ascending) {
+        displayUserList.value.sort((a, b) => a.username.compareTo(b.username));
+      } else {
+        displayUserList.value.sort((a, b) => b.username.compareTo(a.username));
+      }
+    }
+    if (columnIndex == 1) {
+      if (ascending) {
+        displayUserList.value.sort((a, b) => a.email.compareTo(b.email));
+      } else {
+        displayUserList.value.sort((a, b) => b.email.compareTo(a.email));
+      }
+    }
+    // if (columnIndex == 2) {
+    //   if (ascending) {
+    //     allArticleList.sort((a, b) => a.tags.compareTo(b.creator!));
+    //   } else {
+    //     allArticleList.sort((a, b) => b.tags.compareTo(a.creator!));
+    //   }
+    // }
+    sortColumnIndex = sortColumnIndex;
+    sort = sort;
+  }
+
 
   var getUserListResponse =
       GetUserList(success: "", data: null, message: "", error: "", links: null, count: null).obs;
@@ -68,12 +101,15 @@ class ReadUserController extends GetxController {
     fullUsersList?.clear();
     isGettingUsers.value = true;
     gotUsers = 0;
+    nbrOfUsers.value = 0;
     int page = 1;
+
+    debugPrint("ini masalahnya : ${nbrOfUsers.value}");
 
     do {
       try {
         getUserListResponse.value = (await _userRead.getUserList(page))!;
-        debugPrint("check value getUserListResponse: ${getUserListResponse.value.data}");
+        debugPrint("check value getUserListResponse: ${getUserListResponse.value.data?.length}");
         fullUsersList?.addAll(getUserListResponse.value.data as Iterable<GetUserData>);
         if(gotUsers == 0) {
           nbrOfUsers.value = getUserListResponse.value.count!;
@@ -101,11 +137,13 @@ class ReadUserController extends GetxController {
             id: e.id!,
             username: e.username!,
             email: e.email!,
+            phoneNumber: e.phoneNumber!,
             lastLogin: e.lastLogin!,
             avatar: e.avatar!
         ))).toList());
     // updateReadiness();
     cachedUserList.value = displayUserList.value;
+    debugPrint("helo check dulu: ${cachedUserList.value.length}");
     gotUserList.value = true;
     isGettingUsers.value = false;
     return fullUsersList;
