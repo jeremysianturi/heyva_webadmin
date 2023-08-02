@@ -20,6 +20,27 @@ class TermsOfServiceView extends GetView<TermsOfServiceController> {
               fit: BoxFit.fill,
             ),
           ),
+<<<<<<< HEAD
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          _parseHtmlString(termsController.termsOfServiceText)!,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
+=======
           child: CustomScrollView(
             slivers: [
               SliverFillRemaining(
@@ -45,6 +66,7 @@ class TermsOfServiceView extends GetView<TermsOfServiceController> {
           //     Text(termsController.termsOfServiceText)
           //   ],
           // ),
+>>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
           ),
     );
   }

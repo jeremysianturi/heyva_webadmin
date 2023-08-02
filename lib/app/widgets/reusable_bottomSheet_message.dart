@@ -24,7 +24,7 @@ bottomSheetMessage({String desc = "", String color = "red"}) {
           color: colorBg,
           borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(10), topRight: Radius.circular(10))),
-      padding: EdgeInsets.fromLTRB(16, 12, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -33,7 +33,7 @@ bottomSheetMessage({String desc = "", String color = "red"}) {
             height: 10,
           ),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Center(
               child: Text(
                 desc,
@@ -53,7 +53,7 @@ bottomSheetMessage({String desc = "", String color = "red"}) {
       ),
     ),
     isDismissible: true,
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
             topLeft: Radius.circular(10), topRight: Radius.circular(10))),
     enableDrag: false,

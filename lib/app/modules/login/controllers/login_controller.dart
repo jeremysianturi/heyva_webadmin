@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../../../../constant/keys.dart';
 import '../../../../constant/strings.dart';
-import '../../../../constant/variabels.dart';
+import '../../../../constant/variables.dart';
 import '../../../../services/dio_services.dart';
-import '../../../routes/app_pages.dart';
 import '../model/login_model.dart';
 import '../providers/login_provider.dart';
 
@@ -20,7 +20,7 @@ class LoginController extends GetxController {
   late LoginProvider _provider;
   var errorMessage = ''.obs;
   var isEmailError = false.obs;
-  var isPasserror = false.obs;
+  var isPassError = false.obs;
   var box = GetStorage();
 
   @override
@@ -32,7 +32,7 @@ class LoginController extends GetxController {
 
   bool get validateData {
     isEmailError.value = false;
-    isPasserror.value = false;
+    isPassError.value = false;
     errorMessage.value = "";
     if (emailC.text.isEmpty) {
       isEmailError.value = true;
@@ -40,7 +40,7 @@ class LoginController extends GetxController {
       return false;
     }
     if (passC.text.isEmpty) {
-      isPasserror.value = true;
+      isPassError.value = true;
       errorMessage.value = Strings.emptyForm;
       return false;
     }
@@ -52,22 +52,34 @@ class LoginController extends GetxController {
     return true;
   }
 
-  var loginResonse =
+  var loginResponse =
       LoginModel(success: "", data: null, message: "", error: "").obs;
 
-  postLogin() async {
+  Future<bool> postLogin() async {
     errorMessage.value = "";
     isLoading.value = true;
     try {
-      loginResonse.value =
+      loginResponse.value =
       (await _provider.Login(username: emailC.text, password: passC.text))!;
       isLoading.value = false;
 
-      if (loginResonse.value.success == "Success") {
+      if (loginResponse.value.success == "Success") {
         var box = GetStorage();
         box.write(
-            Keys.loginAccessToken, loginResonse.value.data?.accessToken ?? "");
+            Keys.loginAccessToken, loginResponse.value.data?.accessToken ?? "");
         box.write(Keys.loginRefreshToken,
+<<<<<<< HEAD
+            loginResponse.value.data?.refreshToken ?? "");
+        box.write(Keys.loginID, loginResponse.value.data?.id ?? "");
+        authToken = box.read(Keys.loginAccessToken).toString();
+        refreshToken = box.read(Keys.loginRefreshToken).toString();
+        Future.delayed(800.milliseconds);
+        // Get.toNamed(Routes.PRIVACY_POLICY);
+        // emailC.clear();
+        // passC.clear();
+        // Get.off(const AdminLayout());
+        return true;
+=======
             loginResonse.value.data?.refreshToken ?? "");
         box.write(Keys.loginID, loginResonse.value.data?.id ?? "");
         authToken = "Bearer ${loginResonse.value.data!.accessToken}";
@@ -75,36 +87,38 @@ class LoginController extends GetxController {
         userId = loginResonse.value.data?.id ?? "";
         Future.delayed(800.milliseconds);
         Get.toNamed(Routes.DELETE_ACCOUNT);
+>>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
       } else {
-        if (loginResonse.value.message
+        if (loginResponse.value.message
             .toString()
             .toLowerCase()
             .contains("pass")) {
-          isPasserror.value = true;
+          isPassError.value = true;
         } else {
           isEmailError.value = true;
-          isPasserror.value = true;
+          isPassError.value = true;
         }
-        errorMessage.value = loginResonse.value.message ?? "Error Message";
+        errorMessage.value = loginResponse.value.message ?? "Error Message";
       }
     } catch (e) {
       isLoading.value = false;
 
       debugPrint("error  $e");
     }
+    return false;
   }
 
   var response =
       LoginModel(success: "", data: null, message: "", error: "").obs;
 
-  refresh() async {
+  tokenRefresh() async {
     errorMessage.value = "";
     isLoading.value = true;
     var userId = box.read(Keys.loginID);
-    var refres = box.read(Keys.loginRefreshToken);
+    var refresh = box.read(Keys.loginRefreshToken);
     try {
       response.value =
-      (await _provider.refreshToken(refreshToken: refres, userId: userId))!;
+      (await _provider.refreshToken(refreshToken: refresh, userId: userId))!;
       isLoading.value = false;
 
       if (response.value.success == "Success") {
@@ -116,9 +130,10 @@ class LoginController extends GetxController {
         authToken = box.read(Keys.loginAccessToken).toString();
         refreshToken = box.read(Keys.loginRefreshToken).toString();
         Future.delayed(800.milliseconds);
-        Get.toNamed(Routes.PRIVACY_POLICY);
+        // Below seems just for test
+        // Get.toNamed(Routes.PRIVACY_POLICY);
       } else {
-        errorMessage.value = loginResonse.value.message ?? "Error Message";
+        errorMessage.value = loginResponse.value.message ?? "Error Message";
       }
     } catch (e) {
       isLoading.value = false;

@@ -5,6 +5,7 @@ class ColorApp {
   static const Color btn_orange = Color(0xFFF18A6D);
   static const Color btn_pink = Color(0xFFEC9BAD);
   static const Color btn_maroon = Color(0xFF9F2241);
+  static const Color btn_grey = Color(0xFFA8A8A8);
   static const Color arrow_white = Color(0xFFFFFAF6);
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
