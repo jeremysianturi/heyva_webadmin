@@ -22,6 +22,7 @@ class AdminClient {
       connectTimeout: 5000.milliseconds,
       receiveTimeout: 3000.milliseconds,
     );
+    _dio.options.baseUrl = heyApiBaseUrl;
     return _dio;
   }
   refreshOption() {

@@ -7,7 +7,8 @@ import '../constant/keys.dart';
 import 'logging.dart';
 
 
-String heyApiBaseUrl = 'http://54.169.131.201:8000';
+// String heyApiBaseUrl = 'http://54.169.131.201:8000'; // ver-one version
+String heyApiBaseUrl = 'http://54.169.131.201/';
 
 class DioClient {
   Dio init() {
@@ -26,13 +27,13 @@ class DioClient {
         // 'Authorization': token != "null" ? "Bearer $token" : basicAuthToken,
         'Authorization': basicAuthToken,
       },
-      // connectTimeout: 20.seconds,
-      // receiveTimeout: 10.seconds,
-      connectTimeout: 5.seconds,
-      receiveTimeout: 3.seconds,
+      connectTimeout: 20.seconds,
+      receiveTimeout: 10.seconds,
+      // connectTimeout: 5.seconds,
+      // receiveTimeout: 3.seconds,
     );
     // _dio.options.baseUrl = "http://api-service.heyva.health/";
-    // _dio.options.baseUrl = heyApiBaseUrl;
+    _dio.options.baseUrl = heyApiBaseUrl;
     return _dio;
   }
 
