@@ -1,24 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-<<<<<<< HEAD
 import 'package:heyva_web_admin/app/modules/resetpassword/views/resetpassword_view.dart';
 import 'package:heyva_web_admin/app/modules/termsofservice/views/termsofservice_view.dart';
-=======
-import 'package:heyva_web_admin/app/routes/app_pages.dart';
->>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
 import 'package:loading_overlay/loading_overlay.dart';
-
 import '../../../../constant/colors.dart';
 import '../../../../constant/strings.dart';
 import '../../../controllers/auth_controller.dart';
 import '../../../routes/app_pages.dart';
 import '../../../widgets/reusable_orange_button_with_trailing_icon.dart';
-<<<<<<< HEAD
 import '../../forgotpassword/views/forgotpass_view.dart';
 import '../../home/views/admin_layout.dart';
 import '../../privacypolicy/views/privacypolicy_view.dart';
-=======
->>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
 import '../controllers/login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -51,41 +43,6 @@ class LoginView extends GetView<LoginController> {
                   Expanded(
                     flex: 1,
                     child: Container(
-<<<<<<< HEAD
-=======
-                      child: Column(
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              // Get.to(TermsOfServiceView());
-                              Get.toNamed(Routes.TERMS_OF_SERVICE);
-                            },
-                            child: const Text("Go to Terms of Service"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              // Get.to(PrivacyPolicyView());
-                              Get.toNamed(Routes.PRIVACY_POLICY);
-                            },
-                            child: const Text("Go to Privacy Policy"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              // Get.to(ForgotPasswordView());
-                              Get.toNamed(Routes.FORGOT_PASSWORD);
-                            },
-                            child: const Text("Go to Forgot Password"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              // Get.to(ForgotPasswordView());
-                              Get.toNamed(Routes.RESET_PASSWORD);
-                            },
-                            child: const Text("Go to Reset Password"),
-                          ),
-                        ],
-                      ),
->>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
                     ),
                   ),
                   Expanded(

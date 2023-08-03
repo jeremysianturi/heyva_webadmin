@@ -6,11 +6,7 @@ import 'package:heyva_web_admin/app/modules/forgotpassword/providers/forgotpass_
 
 import '../../../../constant/keys.dart';
 import '../../../../constant/strings.dart';
-<<<<<<< HEAD
 import '../../../../constant/variables.dart';
-=======
-import '../../../../constant/variabels.dart';
->>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
 import '../../../../services/dio_services.dart';
 import '../../../routes/app_pages.dart';
 

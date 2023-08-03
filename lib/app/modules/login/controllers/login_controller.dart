@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-
 import '../../../../constant/keys.dart';
 import '../../../../constant/strings.dart';
 import '../../../../constant/variables.dart';
@@ -68,7 +67,6 @@ class LoginController extends GetxController {
         box.write(
             Keys.loginAccessToken, loginResponse.value.data?.accessToken ?? "");
         box.write(Keys.loginRefreshToken,
-<<<<<<< HEAD
             loginResponse.value.data?.refreshToken ?? "");
         box.write(Keys.loginID, loginResponse.value.data?.id ?? "");
         authToken = box.read(Keys.loginAccessToken).toString();
@@ -79,15 +77,6 @@ class LoginController extends GetxController {
         // passC.clear();
         // Get.off(const AdminLayout());
         return true;
-=======
-            loginResonse.value.data?.refreshToken ?? "");
-        box.write(Keys.loginID, loginResonse.value.data?.id ?? "");
-        authToken = "Bearer ${loginResonse.value.data!.accessToken}";
-        refreshToken = loginResonse.value.data?.refreshToken ?? "";
-        userId = loginResonse.value.data?.id ?? "";
-        Future.delayed(800.milliseconds);
-        Get.toNamed(Routes.DELETE_ACCOUNT);
->>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
       } else {
         if (loginResponse.value.message
             .toString()

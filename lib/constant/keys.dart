@@ -10,10 +10,6 @@ class Keys {
   static const String termsOfServiceText = "TERMS_OF_SERVICE_TEXT";
   static const String privacyPolicyText = "PRIVACY_POLICY_TEXT";
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 64b537176efe83695f2badc6fc12448d0c01149d
   ///profile
   static const String profileName = "PROFILE_NAME";
   static const String profileImgUrl = "PROFILE_IMG_URL";
