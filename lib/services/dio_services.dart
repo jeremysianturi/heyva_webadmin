@@ -8,7 +8,8 @@ import 'logging.dart';
 
 
 // String heyApiBaseUrl = 'http://54.169.131.201:8000'; // ver-one version
-String heyApiBaseUrl = 'http://54.169.131.201/';
+// String heyApiBaseUrl = 'http://54.169.131.201/';
+String heyApiBaseUrl = 'https://internal.heyva.health';
 
 class DioClient {
   Dio init() {
