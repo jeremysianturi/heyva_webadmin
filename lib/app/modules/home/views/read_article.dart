@@ -362,10 +362,10 @@ class ViewArticlePage extends StatelessWidget {
               ),
               const SizedBox(height: 20,),
               // Content body - rendered html
-              Padding(
-                padding: const EdgeInsets.only(top:8.0, right: 8.0, bottom: 8.0),
+              const Padding(
+                padding: EdgeInsets.only(top:8.0, right: 8.0, bottom: 8.0),
                 child: Row(
-                  children: const [
+                  children: [
                     SizedBox(
                       width: 160,
                       child: Text(

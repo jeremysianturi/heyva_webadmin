@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../views/dashboard_view.dart';
 import '../views/logout_view.dart';
+import '../views/post_article_video.dart';
 import '../views/user_view.dart';
 import '../views/post_article.dart';
 import '../views/read_article.dart';
-import '../views/update_article.dart';
 import 'menu_controller.dart';
 import 'navigation_controllers.dart';
 
@@ -17,6 +17,9 @@ const dashboardPageRoute = "/admin/dashboard";
 
 const createPageDisplayName = "New Article";
 const createPageRoute = "/admin/create";
+
+const createVideoPageDisplayName = "New Article Video";
+const createVideoPageRoute = "/admin/create-video";
 
 // const updatePageDisplayName = "Update Article";
 // const updatePageRoute = "/admin/update";
@@ -44,6 +47,7 @@ NavigationController navigationController = NavigationController.instance;
 List<MenuItem> sideMenuItemRoutes = [
   MenuItem(dashboardPageDisplayName, dashboardPageRoute),
   MenuItem(createPageDisplayName, createPageRoute),
+  MenuItem(createVideoPageDisplayName, createVideoPageRoute),
   // MenuItem(updatePageDisplayName, updatePageRoute),
   MenuItem(readPageDisplayName, readPageRoute),
   MenuItem(userPageDisplayName, userPageRoute),
@@ -59,6 +63,8 @@ Route<dynamic>? toGenerateRoute(RouteSettings settings){
       return _getPageRoute(DashboardPage(), settings);
     case createPageRoute:
       return _getPageRoute(CreateArticlePage(), settings);
+    case createVideoPageRoute:
+      return _getPageRoute(CreateArticleVideoPage(), settings);
     // case updatePageRoute:
     //   return _getPageRoute(UpdateArticlePage(), settings);
     case readPageRoute:

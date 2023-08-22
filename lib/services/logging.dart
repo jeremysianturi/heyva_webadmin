@@ -32,7 +32,7 @@ class Logging extends Interceptor {
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
-    /// hadling error
+    /// handling error
     debugPrint(
       'ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}',
     );
