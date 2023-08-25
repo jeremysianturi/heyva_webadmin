@@ -350,4 +350,56 @@ class DeleteArticleData {
     data['id'] = id!;
     return data;
   }
+
+}
+
+class AttArticleModel {
+  AttArticleModel({
+    required this.success, required this.data, required this.message, required this.error
+  });
+  late final String? success;
+  late final AttArticleData? data;
+  late final String? message;
+  late final String? error;
+
+  AttArticleModel.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    data = AttArticleData.fromJson(json['data']);
+    message = json['message'];
+    error = json['error'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+
+    _data['success'] = success;
+    _data['data'] = data?.toJson();
+    _data['message'] = message;
+    _data['error'] = error;
+    return _data;
+  }
+}
+
+class AttArticleData {
+  AttArticleData({
+    required this.id, required this.article, required this.attachment
+  });
+
+  late final String? id;
+  late final String? article;
+  late final String? attachment;
+
+  AttArticleData.fromJson(List<dynamic> json) {
+    id = json[0]['id'];
+    article = json[0]['article'];
+    attachment = json[0]['attachment'];
+  }
+
+  List<dynamic> toJson() {
+    final data = <dynamic>[{}];
+    data[0]['id'] = id!;
+    data[0]['article'] = article!;
+    data[0]['attachment'] = attachment!;
+    return data;
+  }
 }

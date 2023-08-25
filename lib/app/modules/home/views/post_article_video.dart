@@ -318,11 +318,11 @@ class CreateArticleVideoPage extends GetView<CreateController> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    createCtrl.isSelectedImage ?
+                    createCtrl.isSelectedImageAttachment ?
                     createCtrl.gotAttachmentId.value ?
                     ElevatedButton(
                       onPressed: () {
-                        createCtrl.clearPhotoAndId();
+                        createCtrl.clearPhotoAndIdAttachment();
                         attachmentId = '';
                       },
                       style: ButtonStyle(
@@ -385,8 +385,8 @@ class CreateArticleVideoPage extends GetView<CreateController> {
                     )
                         : ElevatedButton(
                       onPressed: () async {
-                        await createCtrl.selectImage();
-                        if(createCtrl.imageFileName.isEmpty) {
+                        await createCtrl.selectImageAttachment();
+                        if(createCtrl.imageFileNameAttachment.isEmpty) {
                           // Launch a snackbar message
                           // Error handler
                         }
@@ -417,9 +417,9 @@ class CreateArticleVideoPage extends GetView<CreateController> {
                     ),
 
                     const SizedBox(width: 20),
-                    createCtrl.imageFileName.isNotEmpty ?
+                    createCtrl.imageFileNameAttachment.isNotEmpty ?
                     Text(
-                      createCtrl.imageFileName,
+                      createCtrl.imageFileNameAttachment,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic),
@@ -427,14 +427,14 @@ class CreateArticleVideoPage extends GetView<CreateController> {
                         : const Text(''),
 
                     const SizedBox(width: 20),
-                    createCtrl.isSelectedImage ?
+                    createCtrl.isSelectedImageAttachment ?
                     createCtrl.gotAttachmentId.value ?
                     const Text('')
                         : ElevatedButton(
                       onPressed: () async {
-                        createCtrl.clearPhotoAndId();
-                        await createCtrl.selectImage();
-                        if(createCtrl.imageFileName.isEmpty) {
+                        createCtrl.clearPhotoAndIdAttachment();
+                        await createCtrl.selectImageAttachment();
+                        if(createCtrl.imageFileNameAttachment.isEmpty) {
                           // Launch a snackbar message
                           // Error handler
                         }
@@ -474,7 +474,7 @@ class CreateArticleVideoPage extends GetView<CreateController> {
               ),
               // const SizedBox(height: 20,),
               // Video widget container
-              createCtrl.imageBytes.value.isEmpty ?
+              createCtrl.imageBytesAttachment.value.isEmpty ?
               const Text(
                   "Press to select video.",
                   style: TextStyle(color: ColorApp.grey_container)
@@ -487,7 +487,7 @@ class CreateArticleVideoPage extends GetView<CreateController> {
                     Expanded(
                       // height: 400,
                       // width: width / 2,
-                      child: Image.memory(createCtrl.imageBytes.value),
+                      child: Image.memory(createCtrl.imageBytesAttachment.value),
                     ),
                   ],
                 ),

@@ -45,6 +45,8 @@ class CreateProvider {
     required String body,
     required List<String> tagsId,
     required String mode,
+    required Uint8List bytes,
+    required String fileName,
   }) async {
     PostArticleModel? resp;
 
@@ -54,6 +56,7 @@ class CreateProvider {
         "body": body,
         "attachment": artId,
         "creator": creator,
+        "thumbnail": MultipartFile.fromBytes(bytes, filename: fileName),
       });
       for(int i=0 ; i < tagsId.length ; i++) {
         formData.fields.add(MapEntry("tag", tagsId[i]));
@@ -117,7 +120,7 @@ class CreateController extends GetxController {
 
   var isPostingArticle = false;
   var isGettingTags = false;
-  bool isSelectedImage = false;
+  bool isSelectedImageAttachment = false;
   var errorPostMessage = ''.obs;
   var gotAttachmentId = false.obs;
   var gotPostingId = false.obs;
@@ -128,9 +131,9 @@ class CreateController extends GetxController {
   late String artTitle;
   late String artTopic;
   late DateTime postDate;
-  String imageFileName = '';
+  String imageFileNameAttachment = '';
   String htmlFileName = '';
-  var imageBytes = Uint8List(0).obs;
+  var imageBytesAttachment = Uint8List(0).obs;
   var htmlBytes = Uint8List(0).obs;
   List<TagsData>? fullTags = [];
   List<TagIdName> tagIdNames = [];
@@ -139,6 +142,9 @@ class CreateController extends GetxController {
   var itemsSelected = <MultiSelectItem<TagIdName>>[].obs;
   List<String> selectedTagsId = [];
   var selectedMode = ''.obs;
+  bool isSelectedImageThumbnail = false;
+  String imageFileNameThumbnail = '';
+  var imageBytesThumbnail = Uint8List(0).obs;
 
 
   var getIdResponse =
@@ -146,12 +152,12 @@ class CreateController extends GetxController {
 
   getAttachmentId() async {
 
-    if(isSelectedImage) {
+    if(isSelectedImageAttachment) {
       errorPostMessage.value = '';
         try {
           getIdResponse.value = (await _create.createArticleAttachment(
-            bytes: imageBytes.value,
-            fileName: imageFileName,
+            bytes: imageBytesAttachment.value,
+            fileName: imageFileNameAttachment,
             mode: selectedMode.value.toLowerCase()
           ))!;
           if(getIdResponse.value.success == 'Success') {
@@ -167,8 +173,8 @@ class CreateController extends GetxController {
               _client.refreshOption();
               try {
                 getIdResponse.value = (await _create.createArticleAttachment(
-                  bytes: imageBytes.value,
-                  fileName: imageFileName,
+                  bytes: imageBytesAttachment.value,
+                  fileName: imageFileNameAttachment,
                   mode: selectedMode.value.toLowerCase()
                 ))!;
                 if(getIdResponse.value.success == 'Success') {
@@ -209,7 +215,9 @@ class CreateController extends GetxController {
           creator: creatorCtrl.value.text,
           body: htmlCtrl.value.text,
           tagsId: selectedTagsId,
-          mode: selectedMode.value.toLowerCase()
+          mode: selectedMode.value.toLowerCase(),
+          bytes: imageBytesThumbnail.value,
+          fileName: imageFileNameThumbnail,
         ))!;
         isPostingArticle = false;
         articleId.value = postArticleResponse.value.data!.id!;
@@ -232,7 +240,9 @@ class CreateController extends GetxController {
               creator: creatorCtrl.value.text,
               body: htmlCtrl.value.text,
               tagsId: selectedTagsId,
-              mode: selectedMode.value.toLowerCase()
+              mode: selectedMode.value.toLowerCase(),
+              bytes: imageBytesThumbnail.value,
+              fileName: imageFileNameThumbnail,
             ))!;
             isPostingArticle = false;
             articleId.value = postArticleResponse.value.data!.id!;
@@ -296,30 +306,51 @@ class CreateController extends GetxController {
     }
   }
 
-  Future<String> selectImage() async {
-    imageFileName = '';
+  Future<String> selectImageAttachment() async {
+    imageFileNameAttachment = '';
     final mediaInfo = await ImagePickerWeb.getImageInfo;
     final data = mediaInfo?.data;
 
     if (data != null) {
-      imageBytes.value = data;
-      imageFileName = mediaInfo!.fileName!;
-      isSelectedImage = true;
+      imageBytesAttachment.value = data;
+      imageFileNameAttachment = mediaInfo!.fileName!;
+      isSelectedImageAttachment = true;
       updateReadiness();
     }
-    return imageFileName;
+    return imageFileNameAttachment;
+  }
+
+  Future<String> selectImageThumbnail() async {
+    imageFileNameThumbnail = '';
+    final mediaInfo = await ImagePickerWeb.getImageInfo;
+    final data = mediaInfo?.data;
+
+    if (data != null) {
+      imageBytesThumbnail.value = data;
+      imageFileNameThumbnail = mediaInfo!.fileName!;
+      isSelectedImageThumbnail = true;
+      updateReadiness();
+    }
+    return imageFileNameThumbnail;
   }
 
   void getImageBytes(Uint8List data) {
-    data = imageBytes.value;
+    data = imageBytesAttachment.value;
   }
 
-  void clearPhotoAndId() {
+  void clearPhotoAndIdAttachment() {
     attachmentId.value = '';
     gotAttachmentId.value = false;
-    imageFileName = '';
-    imageBytes.value = Uint8List(0);
-    isSelectedImage = false;
+    imageFileNameAttachment = '';
+    imageBytesAttachment.value = Uint8List(0);
+    isSelectedImageAttachment = false;
+    updateReadiness();
+  }
+
+  void clearPhotoThumbnail() {
+    imageFileNameThumbnail = '';
+    imageBytesThumbnail.value = Uint8List(0);
+    isSelectedImageThumbnail = false;
     updateReadiness();
   }
 
@@ -352,6 +383,7 @@ class CreateController extends GetxController {
       creatorCtrl.text.isNotEmpty &&
       dateCtrl.text.isNotEmpty &&
       attachmentId.value.isNotEmpty &&
+      imageFileNameThumbnail.isNotEmpty &&
       titleCtrl.value.text.isNotEmpty &&
       creatorCtrl.value.text.isNotEmpty &&
       dateCtrl.value.text.isNotEmpty &&
@@ -368,17 +400,20 @@ class CreateController extends GetxController {
   clearCreatePage() {
     if(gotPostingId.value) {
       selectedMode.value = '';
-      imageFileName = '';
+      imageFileNameAttachment = '';
+      imageFileNameThumbnail = '';
       htmlFileName = '';
       attachmentId.value = '';
       articleId.value = '';
-      isSelectedImage = false;
+      isSelectedImageAttachment = false;
+      isSelectedImageThumbnail = false;
       gotAttachmentId.value = false;
       titleCtrl.clear();
       creatorCtrl.clear();
       dateCtrl.clear();
       htmlCtrl.clear();
-      imageBytes.value = Uint8List(0);
+      imageBytesAttachment.value = Uint8List(0);
+      imageBytesThumbnail.value = Uint8List(0);
       htmlBytes.value = Uint8List(0);
       gotTagsList.value = false;
       selectedTags.value.removeRange(0, selectedTagsId.length);

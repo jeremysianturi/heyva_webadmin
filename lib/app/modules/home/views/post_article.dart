@@ -308,7 +308,7 @@ class CreateArticlePage extends GetView<CreateController> {
                   const SizedBox(
                     width: 160,
                     child: Text(
-                      'Photo',
+                      'Photo Attachment',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.normal,
@@ -316,11 +316,11 @@ class CreateArticlePage extends GetView<CreateController> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  createCtrl.isSelectedImage ?
+                  createCtrl.isSelectedImageAttachment ?
                     createCtrl.gotAttachmentId.value ?
                       ElevatedButton(
                         onPressed: () {
-                          createCtrl.clearPhotoAndId();
+                          createCtrl.clearPhotoAndIdAttachment();
                           attachmentId = '';
                         },
                         style: ButtonStyle(
@@ -355,6 +355,10 @@ class CreateArticlePage extends GetView<CreateController> {
                           if (attachmentId.isEmpty) {
                             // Error handler
                           }
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                            content: Text("Please select article mode first"),
+                          ));
                         }
                       },
                       style: ButtonStyle(
@@ -383,8 +387,8 @@ class CreateArticlePage extends GetView<CreateController> {
                     )
                     : ElevatedButton(
                       onPressed: () async {
-                        await createCtrl.selectImage();
-                        if(createCtrl.imageFileName.isEmpty) {
+                        await createCtrl.selectImageAttachment();
+                        if(createCtrl.imageFileNameAttachment.isEmpty) {
                           // Launch a snackbar message
                           // Error handler
                         }
@@ -409,15 +413,15 @@ class CreateArticlePage extends GetView<CreateController> {
                         children: <Widget>[
                           Icon(Icons.file_upload),
                           SizedBox(width: 5),
-                          Text('Select Photo')
+                          Text('Select Photo Attachment')
                         ],
                       ),
                     ),
 
                   const SizedBox(width: 20),
-                  createCtrl.imageFileName.isNotEmpty ?
+                  createCtrl.imageFileNameAttachment.isNotEmpty ?
                     Text(
-                      createCtrl.imageFileName,
+                      createCtrl.imageFileNameAttachment,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontStyle: FontStyle.italic),
@@ -425,14 +429,14 @@ class CreateArticlePage extends GetView<CreateController> {
                     : const Text(''),
 
                   const SizedBox(width: 20),
-                  createCtrl.isSelectedImage ?
+                  createCtrl.isSelectedImageAttachment ?
                     createCtrl.gotAttachmentId.value ?
                       const Text('')
                       : ElevatedButton(
                         onPressed: () async {
-                          createCtrl.clearPhotoAndId();
-                          await createCtrl.selectImage();
-                          if(createCtrl.imageFileName.isEmpty) {
+                          createCtrl.clearPhotoAndIdAttachment();
+                          await createCtrl.selectImageAttachment();
+                          if(createCtrl.imageFileNameAttachment.isEmpty) {
                             // Launch a snackbar message
                             // Error handler
                           }
@@ -457,7 +461,7 @@ class CreateArticlePage extends GetView<CreateController> {
                         children: <Widget>[
                           Icon(Icons.file_upload),
                           SizedBox(width: 5),
-                          Text('Change Photo')
+                          Text('Change Photo Attachment')
                         ],
                       ),
                     )
@@ -472,9 +476,9 @@ class CreateArticlePage extends GetView<CreateController> {
             ),
             // const SizedBox(height: 20,),
             // Photo widget container
-            createCtrl.imageBytes.value.isEmpty ?
+            createCtrl.imageBytesAttachment.value.isEmpty ?
               const Text(
-                "Press to select photo.",
+                "This photo attachment will go into the html article (only for heyva website).",
                 style: TextStyle(color: ColorApp.grey_container)
               )
               : SizedBox(
@@ -485,11 +489,165 @@ class CreateArticlePage extends GetView<CreateController> {
                     Expanded(
                       // height: 400,
                       // width: width / 2,
-                      child: Image.memory(createCtrl.imageBytes.value),
+                      child: Image.memory(createCtrl.imageBytesAttachment.value),
                     ),
                   ],
                 ),
               ),
+            const SizedBox(height: 20,),
+            ///////////////////////////////////////////////////////////////////////////////////////////
+            Padding(
+              padding: const EdgeInsets.only(top:8.0, right: 8.0, bottom: 8.0),
+              child: Row(
+                children: <Widget>[
+                  const SizedBox(
+                    width: 160,
+                    child: Text(
+                      'Thumbnail',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  createCtrl.isSelectedImageThumbnail ?
+                  ElevatedButton(
+                    onPressed: () {
+                      createCtrl.clearPhotoThumbnail();
+                      attachmentId = '';
+                    },
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(
+                          const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                              vertical: 10.0)
+                      ),
+                      textStyle: MaterialStateProperty.all(
+                        const TextStyle(fontSize: 16),
+                      ),
+                      backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    child: const Row(
+                      children: <Widget>[
+                        Icon(Icons.delete),
+                        SizedBox(width: 5),
+                        Text('Cancel')
+                      ],
+                    ),
+                  )
+                      : ElevatedButton(
+                    onPressed: () async {
+                      await createCtrl.selectImageThumbnail();
+                      if(createCtrl.imageFileNameThumbnail.isEmpty) {
+                        // Launch a snackbar message
+                        // Error handler
+                      }
+                    },
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(
+                          const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                              vertical: 10.0)
+                      ),
+                      textStyle: MaterialStateProperty.all(
+                        const TextStyle(fontSize: 16),
+                      ),
+                      backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    child: const Row(
+                      children: <Widget>[
+                        Icon(Icons.file_upload),
+                        SizedBox(width: 5),
+                        Text('Select Thumbnail')
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 20),
+                  createCtrl.imageFileNameThumbnail.isNotEmpty ?
+                  Text(
+                    createCtrl.imageFileNameThumbnail,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontStyle: FontStyle.italic),
+                  )
+                      : const Text(''),
+
+                  const SizedBox(width: 20),
+                  createCtrl.isSelectedImageThumbnail ?
+                  createCtrl.gotAttachmentId.value ?
+                  const Text('')
+                      : ElevatedButton(
+                    onPressed: () async {
+                      createCtrl.clearPhotoThumbnail();
+                      await createCtrl.selectImageThumbnail();
+                      if(createCtrl.imageFileNameThumbnail.isEmpty) {
+                        // Launch a snackbar message
+                        // Error handler
+                      }
+                    },
+                    style: ButtonStyle(
+                      padding: MaterialStateProperty.all(
+                          const EdgeInsets.symmetric(
+                              horizontal: 10.0,
+                              vertical: 10.0)
+                      ),
+                      textStyle: MaterialStateProperty.all(
+                        const TextStyle(fontSize: 16),
+                      ),
+                      backgroundColor: MaterialStateProperty.all(ColorApp.btn_pink),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                    child: const Row(
+                      children: <Widget>[
+                        Icon(Icons.file_upload),
+                        SizedBox(width: 5),
+                        Text('Change Thumbnail')
+                      ],
+                    ),
+                  )
+                      : const Text(''),
+                  Expanded(
+                    child: createCtrl.gotAttachmentId.value ?
+                    Text('Id: ${createCtrl.attachmentId.value}')
+                        : const Text(""),
+                  ),
+                ],
+              ),
+            ),
+            createCtrl.imageBytesThumbnail.value.isEmpty ?
+            const Text(
+                "Press to select thumbnail.",
+                style: TextStyle(color: ColorApp.grey_container)
+            )
+                : SizedBox(
+              height: 400,
+              child: Row(
+                children: [
+                  const SizedBox(width: 160,),
+                  Expanded(
+                    // height: 400,
+                    // width: width / 2,
+                    child: Image.memory(createCtrl.imageBytesThumbnail.value),
+                  ),
+                ],
+              ),
+            ),
+            ///////////////////////////////////////////////////////////////////////////////////////////
             const SizedBox(height: 20,),
             // Content html editing / selection field
             Padding(

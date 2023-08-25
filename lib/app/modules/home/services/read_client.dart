@@ -1,11 +1,13 @@
 
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart' as milliseconds;
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:image_picker_web/image_picker_web.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import '../../login/controllers/login_controller.dart';
 import '../model/read_article_data.dart';
@@ -15,6 +17,28 @@ import './admin_api.dart';
 class ReadProvider {
   final Dio _readClient;
   ReadProvider(this._readClient);
+
+  Future<AttArticleModel?> createArticleAttachment({required Uint8List bytes, required String fileName, required String mode}) async {
+    AttArticleModel? resp;
+
+    try {
+      FormData formData = FormData.fromMap({
+        "attachment": MultipartFile.fromBytes(bytes, filename: fileName),
+        // "app_env": mode,
+      });
+      Response response = await _readClient.post("/api/v1/article-attachment/create", data: formData);
+      resp = AttArticleModel.fromJson(response.data);
+
+    } on DioError catch (err) {
+      debugPrint('POST fail with result: ${err.response?.statusCode}');
+      var message = err.response?.data['message'];
+      var error = err.response?.data['error'];
+      // in case of message of error is 'Expired Signature' then will retry getNewId() after refresh the authToken
+      resp = AttArticleModel(success: "", data: null, message: message, error: error);
+    }
+
+    return resp;
+  }
 
   Future<GetArticleList?> getArticleList(int page, String mode) async {
     GetArticleList? resp;
@@ -86,8 +110,9 @@ class ReadProvider {
     required String body,
     required String creator,
     required String? banner,
-    required String? thumbnail,
     required List<String?> tagsId,
+    required Uint8List bytes,
+    required String fileName,
     // required String mode,
   }) async {
     UpdateArticleModel? resp;
@@ -98,7 +123,7 @@ class ReadProvider {
         "body": body,
         "creator": creator,
         "banner": banner,
-        "thumbnail": thumbnail,
+        "thumbnail": MultipartFile.fromBytes(bytes, filename: fileName),
       });
       for(int i=0 ; i < tagsId.length ; i++) {
         formData.fields.add(MapEntry("tag", tagsId[i]!));
@@ -158,7 +183,6 @@ class ReadController extends GetxController {
   final TextEditingController creatorCtrl = TextEditingController();
   final TextEditingController htmlCtrl = TextEditingController();
   final TextEditingController tagCtrl = TextEditingController();
-  final TextEditingController dateCtrl = TextEditingController();
 
   var viewListMode = true.obs;
   var viewUpdateArticleMode = false.obs;
@@ -187,14 +211,21 @@ class ReadController extends GetxController {
   List<TagIdName> initialArticleTags = [];
   var selectedId = "".obs;
   var isUpdatingArticle = false;
-  var attachmentId = ''.obs;
   var articleId = '';
   var gotUpdatingId = false.obs;
   var isUpdatingReady = false.obs;
   var totalArticleProd = 0.obs;
   var totalArticleDev = 0.obs;
   var totalArticle = 0.obs;
-
+  bool isSelectedImageAttachment = false;
+  var imageBytesAttachment = Uint8List(0).obs;
+  var gotAttachmentId = false.obs;
+  var attachmentId = ''.obs;
+  String imageFileNameAttachment = '';
+  var imageBytesThumbnail = Uint8List(0).obs;
+  bool isSelectedImageThumbnail = false;
+  String imageFileNameThumbnail = '';
+  var initialThumbnail = '';
 
   onSortColumn(int columnIndex, bool ascending) {
     if (columnIndex == 0) {
@@ -233,8 +264,6 @@ class ReadController extends GetxController {
     gotArticles = 0;
     nbrOfArticles = 0;
     int page = 1;
-
-    debugPrint("ini masalahnya2");
 
     do {
       try {
@@ -345,7 +374,7 @@ class ReadController extends GetxController {
       isGettingTags = false;
       fullTags = getTagsResponse.value.data?.toList();
       tagIdNames = fullTags!.map((e) => (TagIdName(id: e.id!, name: e.name!))).toList();
-      items.value = tagIdNames!.map((tag) => MultiSelectItem<TagIdName>(tag, tag.name)).toList();
+      items.value = tagIdNames.map((tag) => MultiSelectItem<TagIdName>(tag, tag.name)).toList();
       gotTagsList.value = true;
       return tagIdNames;
     } catch (err) {
@@ -360,7 +389,7 @@ class ReadController extends GetxController {
           isGettingTags = false;
           fullTags = getTagsResponse.value.data?.toList();
           tagIdNames = fullTags!.map((e) => (TagIdName(id: e.id!, name: e.name!))).toList();
-          items.value = tagIdNames!.map((tag) => MultiSelectItem<TagIdName>(tag, tag.name)).toList();
+          items.value = tagIdNames.map((tag) => MultiSelectItem<TagIdName>(tag, tag.name)).toList();
           gotTagsList.value = true;
           return tagIdNames;
         } catch (err) {
@@ -407,6 +436,7 @@ class ReadController extends GetxController {
       if(fullArticlesList?[i].id == id) {
         selectedArticle = fullArticlesList![i];
         articleId = selectedArticle.id!;
+        initialThumbnail = selectedArticle.thumbnail ?? "";
         titleCtrl.text = selectedArticle.title!;
         tagCtrl.text = listArticleTags(selectedArticle.tags?.map((x) => x.tag?.name).toList() as List<String?>);
         // initialize selected tags in multiselect chip
@@ -482,8 +512,9 @@ class ReadController extends GetxController {
           body: htmlCtrl.value.text,
           creator: creatorCtrl.value.text,
           banner: selectedArticle.banner,
-          thumbnail: selectedArticle.thumbnail,
           tagsId: id,
+          bytes: imageBytesThumbnail.value,
+          fileName: imageFileNameThumbnail,
             // mode: selectedMode.value
         ))!;
         isUpdatingArticle = false;
@@ -507,8 +538,9 @@ class ReadController extends GetxController {
               body: htmlCtrl.value.text,
               creator: creatorCtrl.value.text,
               banner: selectedArticle.banner,
-              thumbnail: selectedArticle.thumbnail,
               tagsId: id,
+              bytes: imageBytesThumbnail.value,
+              fileName: imageFileNameThumbnail,
                 // mode: selectedMode.value.toLowerCase()
             ))!;
             isUpdatingArticle = false;
@@ -532,16 +564,18 @@ class ReadController extends GetxController {
   }
 
   bool updateReadiness() {
-
+    debugPrint("check value ini kenapa ya : ${titleCtrl.text.isNotEmpty} ${creatorCtrl.text.isNotEmpty} \n"
+        "${htmlCtrl.text.isNotEmpty} ${attachmentId.value.isNotEmpty} ${imageFileNameThumbnail.isNotEmpty} \n"
+        "${titleCtrl.value.text.isNotEmpty} ${creatorCtrl.value.text.isNotEmpty} \n"
+        "${selectedTagsId.isNotEmpty} ${htmlCtrl.value.text.isNotEmpty}");
     if(
     titleCtrl.text.isNotEmpty &&
         creatorCtrl.text.isNotEmpty &&
-        dateCtrl.text.isNotEmpty &&
         htmlCtrl.text.isNotEmpty &&
         attachmentId.value.isNotEmpty &&
+        imageFileNameThumbnail.isNotEmpty &&
         titleCtrl.value.text.isNotEmpty &&
         creatorCtrl.value.text.isNotEmpty &&
-        dateCtrl.value.text.isNotEmpty &&
         selectedTagsId.isNotEmpty &&
         htmlCtrl.value.text.isNotEmpty
     ) {
@@ -588,5 +622,100 @@ class ReadController extends GetxController {
     // }
   }
 
+  var getIdResponse =
+      AttArticleModel(success: "", data: null, message: "", error: "").obs;
+
+  getAttachmentId() async {
+
+    if(isSelectedImageAttachment) {
+      errorPostMessage.value = '';
+      try {
+        getIdResponse.value = (await _read.createArticleAttachment(
+            bytes: imageBytesAttachment.value,
+            fileName: imageFileNameAttachment,
+            mode: selectedViewMode.value.toLowerCase()
+        ))!;
+        if(getIdResponse.value.success == 'Success') {
+          attachmentId.value = getIdResponse.value.data!.id!;
+          if(attachmentId.isNotEmpty) {
+            gotAttachmentId.value = true;
+            updateReadiness();
+          }
+        } else {
+          // in case of message of error is 'Expired Signature' then call tokenRefresh and retry
+          if(getIdResponse.value.message == 'Expired Signature') {
+            accessCtrl.tokenRefresh();
+            _client.refreshOption();
+            try {
+              getIdResponse.value = (await _read.createArticleAttachment(
+                  bytes: imageBytesAttachment.value,
+                  fileName: imageFileNameAttachment,
+                  mode: selectedViewMode.value.toLowerCase()
+              ))!;
+              if(getIdResponse.value.success == 'Success') {
+                attachmentId.value = getIdResponse.value.data!.id!;
+                if (attachmentId.isNotEmpty) {
+                  gotAttachmentId.value = true;
+                  updateReadiness();
+                }
+              } else {
+                debugPrint('Bad access token signature and \nfailed to get attachment id: ${getIdResponse.value.message} !');
+              }
+            } catch (err) {
+              debugPrint("error  $err");
+            }
+          }
+        }
+      } catch (err) {
+        debugPrint("error  $err");
+      }
+    } else {
+      debugPrint('Select a picture file first !');
+    }
+  }
+
+  Future<String> selectImageAttachment() async {
+    imageFileNameAttachment = '';
+    final mediaInfo = await ImagePickerWeb.getImageInfo;
+    final data = mediaInfo?.data;
+
+    if (data != null) {
+      imageBytesAttachment.value = data;
+      imageFileNameAttachment = mediaInfo!.fileName!;
+      isSelectedImageAttachment = true;
+      updateReadiness();
+    }
+    return imageFileNameAttachment;
+  }
+
+  Future<String> selectImageThumbnail() async {
+    imageFileNameThumbnail = '';
+    final mediaInfo = await ImagePickerWeb.getImageInfo;
+    final data = mediaInfo?.data;
+
+    if (data != null) {
+      imageBytesThumbnail.value = data;
+      imageFileNameThumbnail = mediaInfo!.fileName!;
+      isSelectedImageThumbnail = true;
+      updateReadiness();
+    }
+    return imageFileNameThumbnail;
+  }
+
+  void clearPhotoAndIdAttachment() {
+    attachmentId.value = '';
+    gotAttachmentId.value = false;
+    imageFileNameAttachment = '';
+    imageBytesAttachment.value = Uint8List(0);
+    isSelectedImageAttachment = false;
+    updateReadiness();
+  }
+
+  void clearPhotoThumbnail() {
+    imageFileNameThumbnail = '';
+    imageBytesThumbnail.value = Uint8List(0);
+    isSelectedImageThumbnail = false;
+    updateReadiness();
+  }
 
 }
